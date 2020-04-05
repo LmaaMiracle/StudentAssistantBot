@@ -40,6 +40,17 @@ public class AssistantBot extends TelegramLongPollingBot {
                     } catch (TelegramApiException e) {
                         e.printStackTrace();
                     }
+                } else if(message.getText().equals("Расписание звонков")) {
+                    try
+                    {
+                        execute(new SendPhoto()
+                                .setChatId(message.getChatId().toString())
+                                .setCaption("@ONPUStudentAssistantBot")
+                                .setPhoto("https://sun9-20.userapi.com/c855416/v855416270/d4ee8/sGnmiLzMUD0.jpg"));
+                    } catch (TelegramApiException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -66,10 +77,13 @@ public class AssistantBot extends TelegramLongPollingBot {
         sendMessage.setReplyMarkup(replyKeyboardMarkup);
 
         KeyboardRow firstRow = new KeyboardRow();
+        KeyboardRow secondRow = new KeyboardRow();
         List<KeyboardRow> keyboard = new ArrayList<>();
 
         firstRow.add(new KeyboardButton("Расписание преподавателя"));
         keyboard.add(firstRow);
+        secondRow.add(new KeyboardButton("Расписание звонков"));
+        keyboard.add(secondRow);
 
         replyKeyboardMarkup.setKeyboard(keyboard);
 
