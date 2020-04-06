@@ -8,79 +8,84 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class AssistantBot extends TelegramLongPollingBot {
 
+
     public static final String lecturerNames = "" +
             "WEB:\n" +
-            "       лекц. — Защёлкин Константин Вячеславович\n" +
-            "       лаб. — Шпиньковский Александр Анатольевич\n" +
+            "       • лекц. — Защёлкин Константин Вячеславович\n" +
+            "       • лаб. — Шпиньковский Александр Анатольевич\n" +
             "Теория вероятности:\n" +
-            "       лекц. — Юрченко Михаил Александрович\n" +
-            "       практ. — Ищенко Алеся Владимировна\n" +
+            "       • лекц. — Юрченко Михаил Александрович\n" +
+            "       • практ. — Ищенко Алеся Владимировна\n" +
             "Численные методы:\n" +
-            "       лекц. — Панькина Анна Сергеевна\n" +
-            "       лаб. — Петросюк Денис Валериевич\n" +
+            "       • лекц. — Панькина Анна Сергеевна\n" +
+            "       • лаб. — Петросюк Денис Валериевич\n" +
             "ООП:\n" +
-            "       лекц., лаб. — Годовиченко Николай Анатолиевич\n" +
+            "       • лекц., лаб. — Годовиченко Николай Анатолиевич\n" +
             "ТКП:\n" +
-            "       лекц., лаб — Галчёнков Олег Николаевич\n" +
+            "       • лекц., лаб — Галчёнков Олег Николаевич\n" +
             "Теория коммуникации:\n" +
-            "       лекц., практ. — Чурсин Николай Николаевич\n" +
+            "       • лекц., практ. — Чурсин Николай Николаевич\n" +
             "Экономика и бизнес:\n" +
-            "       лекц., практ. — Журан Елена Анатолиевна\n" +
+            "       • лекц., практ. — Журан Елена Анатолиевна\n" +
             "Философия:\n" +
-            "       лекц., практ. — Рыбка Наталья Николаевна";
+            "       • лекц., практ. — Рыбка Наталья Николаевна";
 
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
 
         String chatID = update.getMessage().getChatId().toString();
+
         if (message != null && message.hasText()) {
             switch (message.getText()) {
-                case "/start":
+                case "/start": {
                     buttonHolder(message, "Here's your keyboard!");
                     break;
+                }
                 case "Расписание преподавателя": {
-                    SendPhoto sendPhoto = new SendPhoto();
-                    sendPhoto.setChatId(message.getChatId().toString());
-                    sendPhoto.setCaption("@ONPUStudentAssistantBot");
-                    sendPhoto.setPhoto("https://i.imgur.com/3sQvSQ8.png");
-
                     try {
-                        execute(sendPhoto);
+                        execute(new SendPhoto()
+                                .setChatId(message.getChatId().toString())
+                                .setCaption("@ONPUStudentAssistantBot")
+                                .setPhoto("https://i.imgur.com/3sQvSQ8.png"));
                     } catch (TelegramApiException e) {
                         e.printStackTrace();
                     }
                     break;
                 }
                 case "Расписание студента": {
-                    SendPhoto sendPhoto = new SendPhoto();
-                    sendPhoto.setChatId(message.getChatId().toString());
-                    sendPhoto.setCaption("@ONPUStudentAssistantBot");
-                    sendPhoto.setPhoto("https://i.imgur.com/khEWk4K.png");
-
                     try {
-                        execute(sendPhoto);
+                        execute(new SendPhoto()
+                                .setChatId(message.getChatId().toString())
+                                .setCaption("@ONPUStudentAssistantBot")
+                                .setPhoto("https://i.imgur.com/khEWk4K.png"));
                     } catch (TelegramApiException e) {
                         e.printStackTrace();
                     }
                     break;
                 }
                 case "Имена преподавателей": {
-                    SendMessage sendMessage = new SendMessage();
-                    sendMessage.setChatId(message.getChatId().toString());
-                    sendMessage.setText(lecturerNames);
-
                     try {
-                        execute(sendMessage);
+                        execute(new SendMessage()
+                                .setChatId(message.getChatId().toString())
+                                .setText(lecturerNames));
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+                case "Расписание звонков": {
+                    try {
+                        execute(new SendPhoto()
+                                .setChatId(message.getChatId().toString())
+                                .setCaption("@ONPUStudentAssistantBot")
+                                .setPhoto("https://i.imgur.com/dhW3riD.png"));
                     } catch (TelegramApiException e) {
                         e.printStackTrace();
                     }
@@ -118,6 +123,8 @@ public class AssistantBot extends TelegramLongPollingBot {
         keyboard.get(1).add(new KeyboardButton("Расписание студента"));
         keyboard.add(new KeyboardRow());
         keyboard.get(2).add(new KeyboardButton("Имена преподавателей"));
+        keyboard.add(new KeyboardRow());
+        keyboard.get(3).add(new KeyboardButton("Расписание звонков"));
 
         replyKeyboardMarkup.setKeyboard(keyboard);
 
