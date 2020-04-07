@@ -14,7 +14,6 @@ import java.util.List;
 
 public class AssistantBot extends TelegramLongPollingBot {
 
-
     public static final String lecturerNames = "" +
             "WEB:\n" +
             "       • лекц. — Защёлкин Константин Вячеславович\n" +
@@ -36,19 +35,43 @@ public class AssistantBot extends TelegramLongPollingBot {
             "Философия:\n" +
             "       • лекц., практ. — Рыбка Наталья Николаевна";
 
+
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
 
-        String chatID = update.getMessage().getChatId().toString();
+        Long chatID = update.getMessage().getChatId();
+
 
         if (message != null && message.hasText()) {
+            if (message.getText().equals("/start")) {
+                mainButtonsHolder(message, "Вас приветствует бот-помощник, который помогает улучшить организацию" +
+                        " учбеного процесса как студентов, так и преподователей. На клавиатуре выберете касту, " +
+                        "к котороый вы относитесь. ");
+            }
+
             switch (message.getText()) {
-                case "/start": {
-                    buttonHolder(message, "Here's your keyboard!");
+                case "Преподаватель": {
+                    teacherButtonsHolder(message);
                     break;
                 }
-                case "Расписание преподавателя": {
+                case "Студент": {
+                    studentButtonHolder(message);
+                    break;
+                }
+                case "Расписание звонков": {
+                    try {
+                        execute(new SendPhoto()
+                                .setChatId(message.getChatId().toString())
+                                .setCaption("@ONPUStudentAssistantBot")
+                                .setPhoto("https://i.imgur.com/dhW3riD.png"));
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+                //препод
+                case "Расписание": {
                     try {
                         execute(new SendPhoto()
                                 .setChatId(message.getChatId().toString())
@@ -59,7 +82,8 @@ public class AssistantBot extends TelegramLongPollingBot {
                     }
                     break;
                 }
-                case "Расписание студента": {
+                //студент
+                case "Расписание пар": {
                     try {
                         execute(new SendPhoto()
                                 .setChatId(message.getChatId().toString())
@@ -80,15 +104,8 @@ public class AssistantBot extends TelegramLongPollingBot {
                     }
                     break;
                 }
-                case "Расписание звонков": {
-                    try {
-                        execute(new SendPhoto()
-                                .setChatId(message.getChatId().toString())
-                                .setCaption("@ONPUStudentAssistantBot")
-                                .setPhoto("https://i.imgur.com/dhW3riD.png"));
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    }
+                case "Назад": {
+                    mainButtonsHolder(message, "Что выберешь?");
                     break;
                 }
             }
@@ -106,7 +123,7 @@ public class AssistantBot extends TelegramLongPollingBot {
         return "977643237:AAHWqxWnlzziPo2QSrLGhgzgO93ywV8eFN4";
     }
 
-    public void buttonHolder(Message message, String text) {
+    public void teacherButtonsHolder(Message message) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
 
@@ -118,13 +135,68 @@ public class AssistantBot extends TelegramLongPollingBot {
         List<KeyboardRow> keyboard = new ArrayList<>();
 
         keyboard.add(new KeyboardRow());
-        keyboard.get(0).add(new KeyboardButton("Расписание преподавателя"));
+        keyboard.get(0).add(new KeyboardButton("Расписание"));
         keyboard.add(new KeyboardRow());
-        keyboard.get(1).add(new KeyboardButton("Расписание студента"));
+        keyboard.get(1).add(new KeyboardButton("Расписание звонков"));
+        keyboard.add(new KeyboardRow());
+        keyboard.get(2).add(new KeyboardButton("Назад"));
+
+        replyKeyboardMarkup.setKeyboard(keyboard);
+
+        sendMessage.setChatId(message.getChatId().toString());
+
+        try {
+            execute(sendMessage.setText("Вам доступны следующие функции: "));
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void studentButtonHolder(Message message) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(true);
+
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        ButtonsSettings.getSettings(replyKeyboardMarkup);
+
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        keyboard.add(new KeyboardRow());
+        keyboard.get(0).add(new KeyboardButton("Расписание пар"));
+        keyboard.add(new KeyboardRow());
+        keyboard.get(1).add(new KeyboardButton("Расписание звонков"));
         keyboard.add(new KeyboardRow());
         keyboard.get(2).add(new KeyboardButton("Имена преподавателей"));
         keyboard.add(new KeyboardRow());
-        keyboard.get(3).add(new KeyboardButton("Расписание звонков"));
+        keyboard.get(3).add(new KeyboardButton("Назад"));
+
+        replyKeyboardMarkup.setKeyboard(keyboard);
+
+        sendMessage.setChatId(message.getChatId().toString());
+
+        try {
+            execute(sendMessage.setText("keyboard"));
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void mainButtonsHolder(Message message, String text) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.enableMarkdown(true);
+
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        ButtonsSettings.getSettings(replyKeyboardMarkup);
+
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        keyboard.add(new KeyboardRow());
+        keyboard.get(0).add(new KeyboardButton("Преподаватель"));
+        keyboard.get(0).add(new KeyboardButton("Студент"));
 
         replyKeyboardMarkup.setKeyboard(keyboard);
 
