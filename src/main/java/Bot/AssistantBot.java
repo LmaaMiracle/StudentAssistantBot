@@ -17,22 +17,6 @@ import java.util.List;
 
 public class AssistantBot extends TelegramLongPollingBot {
 
-    //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
-    //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - ???
-
-    public void scheduleConfirm() {
-        try {
-            execute(new SendPhoto()
-                    .setChatId("383625717")
-                    .setCaption("@ONPUStudentAssistantBot")
-                    .setPhoto("https://i.imgur.com/khEWk4K.png"));
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-
     public static final String lecturerNames = "" +
             "WEB:\n" +
             "       • лекц. — Защёлкин Константин Вячеславович\n" +
@@ -55,6 +39,21 @@ public class AssistantBot extends TelegramLongPollingBot {
             "       • лекц., практ. — Рыбка Наталья Николаевна";
 
 
+    //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
+    //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - ???
+
+    public void scheduleConfirm() {
+        try {
+            execute(new SendPhoto()
+                    .setChatId("383625717")
+                    .setCaption("@ONPUStudentAssistantBot")
+                    .setPhoto("https://i.imgur.com/khEWk4K.png"));
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
@@ -65,7 +64,7 @@ public class AssistantBot extends TelegramLongPollingBot {
         if (message != null && message.hasText()) {
             if (message.getText().equals("/start")) {
                 mainButtonsHolder(message, "Вас приветствует бот-помощник, который помогает улучшить организацию" +
-                        " учбеного процесса как студентов, так и преподователей. На клавиатуре выберете касту, " +
+                        " учбеного процесса как студентов, так и преподователей. На клавиатуре выберите касту, " +
                         "к котороый вы относитесь. ");
             }
 
@@ -148,10 +147,12 @@ public class AssistantBot extends TelegramLongPollingBot {
         return "Student Assistant";
     }
 
+
     @Override
     public String getBotToken() {
         return "977643237:AAHWqxWnlzziPo2QSrLGhgzgO93ywV8eFN4";
     }
+
 
     public void teacherButtonsHolder(Message message) {
         SendMessage sendMessage = new SendMessage();
@@ -213,6 +214,7 @@ public class AssistantBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
+
 
     public void mainButtonsHolder(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
