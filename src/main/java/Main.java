@@ -1,3 +1,5 @@
+import Bot.AssistantBot;
+import WorkWithTime.Run;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -9,8 +11,11 @@ public class Main {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
             telegramBotsApi.registerBot(new AssistantBot());
+
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+
+        Run.run();
     }
 }

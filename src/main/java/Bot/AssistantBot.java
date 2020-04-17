@@ -1,3 +1,5 @@
+package Bot;
+
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -7,12 +9,29 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import state.Password;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class AssistantBot extends TelegramLongPollingBot {
+
+    //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
+    //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - ???
+
+    public void scheduleConfirm() {
+        try {
+            execute(new SendPhoto()
+                    .setChatId("383625717")
+                    .setCaption("@ONPUStudentAssistantBot")
+                    .setPhoto("https://i.imgur.com/khEWk4K.png"));
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     public static final String lecturerNames = "" +
             "WEB:\n" +
@@ -50,8 +69,19 @@ public class AssistantBot extends TelegramLongPollingBot {
                         "к котороый вы относитесь. ");
             }
 
+//            Timer timer = new Timer();
+
+//            timer.scheduleAtFixedRate(new WorkWithTime.CheckSchedule(), 0, 5000);
+
+
+            SendMessage sendMessage = new SendMessage();
+
+            Password password = new Password(null);
+
+
             switch (message.getText()) {
                 case "Преподаватель": {
+//                    password.update(update);
                     teacherButtonsHolder(message);
                     break;
                 }
@@ -152,6 +182,7 @@ public class AssistantBot extends TelegramLongPollingBot {
         }
     }
 
+
     public void studentButtonHolder(Message message) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
@@ -177,7 +208,7 @@ public class AssistantBot extends TelegramLongPollingBot {
         sendMessage.setChatId(message.getChatId().toString());
 
         try {
-            execute(sendMessage.setText("keyboard"));
+            execute(sendMessage.setText("Вы можете выбрать следующее действие: "));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
@@ -211,3 +242,5 @@ public class AssistantBot extends TelegramLongPollingBot {
     }
 
 }
+
+

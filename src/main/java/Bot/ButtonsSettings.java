@@ -1,3 +1,5 @@
+package Bot;
+
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 public class ButtonsSettings {
@@ -7,4 +9,5 @@ public class ButtonsSettings {
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
     }
+
 }

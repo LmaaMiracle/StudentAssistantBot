@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>StudentAssistantBot</groupId>
-    <artifactId>StudentAssistantBot</artifactId>
+    <groupId>PureBot</groupId>
+    <artifactId>PureBot</artifactId>
     <version>1.0-SNAPSHOT</version>
     <build>
         <plugins>
@@ -28,6 +28,11 @@
             <version>2.12.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.pengrad</groupId>
+            <artifactId>java-telegram-bot-api</artifactId>
+            <version>4.3.1</version>
+        </dependency>
 
         <dependency>
             <groupId>log4j</groupId>
