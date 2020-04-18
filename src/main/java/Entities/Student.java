@@ -10,7 +10,6 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class Student {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @Column(name = "schedule_time")
