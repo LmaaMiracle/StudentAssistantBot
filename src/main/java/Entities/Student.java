@@ -1,13 +1,10 @@
 package Entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "student")
+@Table(name = "Student")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
