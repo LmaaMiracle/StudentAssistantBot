@@ -13,5 +13,3 @@ spring:
     username: qiyzrgvdgacdyz
     password: b49fbff7cb2f0f538309f467192baff7792b89a4997533e3d217e467b206ef2e
     driverClassName: org.postgresql.Driver
-server:
-  port: 9090
