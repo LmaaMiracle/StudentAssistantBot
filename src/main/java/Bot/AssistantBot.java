@@ -1,5 +1,10 @@
 package Bot;
 
+import Entities.Student;
+import Services.StudentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -14,8 +19,10 @@ import state.Password;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Component
 public class AssistantBot extends TelegramLongPollingBot {
+
+    private StudentService studentService = new StudentService();
 
     public static final String lecturerNames = "" +
             "WEB:\n" +
@@ -37,7 +44,6 @@ public class AssistantBot extends TelegramLongPollingBot {
             "       • лекц., практ. — Журан Елена Анатолиевна\n" +
             "Философия:\n" +
             "       • лекц., практ. — Рыбка Наталья Николаевна";
-
 
     //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
     //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - ???
@@ -67,6 +73,15 @@ public class AssistantBot extends TelegramLongPollingBot {
                         " учбеного процесса как студентов, так и преподователей. На клавиатуре выберите касту, " +
                         "к котороый вы относитесь. ");
             }
+            if (message.getText().equals("/register_time")) {
+                System.out.println(studentService);
+                studentService.addStudent(new Student(chatID, "18:00"));
+                try {
+                    execute(new SendMessage().setChatId(chatID).setText("arrr"));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+        }
 
 //            Timer timer = new Timer();
 
