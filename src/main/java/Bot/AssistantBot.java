@@ -75,7 +75,7 @@ public class AssistantBot extends TelegramLongPollingBot {
         for (User listOfUser : listOfUsers) {
             if (listOfUser.getChatId().equals(message.getChatId().toString())) {
                 isNotInList = false;
-                listOfUser.get
+                user = listOfUser;
                 break;
             }
         }
