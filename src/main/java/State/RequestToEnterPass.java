@@ -1,10 +1,9 @@
-package state;
+package State;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import com.pengrad.telegrambot.TelegramBot;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class RequestToEnterPass implements PassState {
     //singleton

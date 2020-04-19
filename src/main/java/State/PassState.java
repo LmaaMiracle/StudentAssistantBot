@@ -1,4 +1,4 @@
-package state;
+package State;
 
 import org.telegram.telegrambots.meta.api.objects.Update;
 
