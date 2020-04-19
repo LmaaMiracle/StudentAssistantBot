@@ -70,7 +70,7 @@ public class AssistantBot extends TelegramLongPollingBot {
 
         boolean isNotInList = true;
 
-        User user;
+        User user = null;
 
         for (User listOfUser : listOfUsers) {
             if (listOfUser.getChatId().equals(message.getChatId().toString())) {
@@ -84,6 +84,7 @@ public class AssistantBot extends TelegramLongPollingBot {
             user = new User();
             user.setChatId(message.getChatId().toString());
             user.setBotState(BotState.Default);
+            listOfUsers.add(user);
         }
         BotState state = user.getBotState();
 
@@ -101,10 +102,14 @@ public class AssistantBot extends TelegramLongPollingBot {
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
-            }
-
-            if (user.getBotState() == BotState.EnterTime) {
+            } else if (user.getBotState() == BotState.EnterTime) {
                 user.setScheduleTime(update.getMessage().getText());
+                user.setBotState(state.nextState());
+                try {
+                    execute(new SendMessage().setChatId(chatID).setText("Уведомление придет в " + user.getScheduleTime()));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
             }
 //            Timer timer = new Timer();
 

@@ -27,10 +27,10 @@ public class CheckSchedule extends TimerTask {
 
     @Override
     public void run() {
-//        for (Student student : students) {
-//            if (student.getNotificationTime().equals(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")))) {
-//                bot.scheduleConfirm(student);
-//            }
-//        }
+        for (User user : AssistantBot.listOfUsers) {
+            if (user.getScheduleTime().equals(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")))) {
+                bot.scheduleConfirm(user);
+            }
+        }
     }
 }
