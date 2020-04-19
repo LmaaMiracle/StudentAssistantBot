@@ -1,6 +1,7 @@
 package WorkWithTime;
 
 import Bot.AssistantBot;
+import Entities.User;
 import Student.Student;
 
 import java.time.LocalTime;
@@ -14,6 +15,7 @@ public class CheckSchedule extends TimerTask {
 
     private final ArrayList<Student> students = new ArrayList<Student>();
 
+    private final User user = new User();
     //здесь для проверки ставьте время большее на 1-2 минуты от текущего
 //    private final String time = "16:10";
 
@@ -25,10 +27,10 @@ public class CheckSchedule extends TimerTask {
 
     @Override
     public void run() {
-        for (Student student : students) {
-            if (student.getNotificationTime().equals(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")))) {
-                bot.scheduleConfirm(student);
-            }
-        }
+//        for (Student student : students) {
+//            if (student.getNotificationTime().equals(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")))) {
+//                bot.scheduleConfirm(student);
+//            }
+//        }
     }
 }

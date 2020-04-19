@@ -1,6 +1,9 @@
 package Bot;
 
+import Entities.User;
+import State.BotState;
 import Student.Student;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -10,13 +13,17 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import state.Password;
 
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Component
 public class AssistantBot extends TelegramLongPollingBot {
+
+    //    public User user;
+    public static final ArrayList<User> listOfUsers = new ArrayList<>();
+
 
     public static final String lecturerNames = "" +
             "WEB:\n" +
@@ -41,12 +48,12 @@ public class AssistantBot extends TelegramLongPollingBot {
 
 
     //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
-    //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - ???
+    //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - 391582879
 
-    public void scheduleConfirm(Student student) {
+    public void scheduleConfirm(User user) {
         try {
             execute(new SendPhoto()
-                    .setChatId(student.getUserId())
+                    .setChatId(user.getChatId())
                     .setCaption("@ONPUStudentAssistantBot")
                     .setPhoto("https://i.imgur.com/khEWk4K.png"));
         } catch (TelegramApiException e) {
@@ -61,23 +68,50 @@ public class AssistantBot extends TelegramLongPollingBot {
 
         Long chatID = update.getMessage().getChatId();
 
+        boolean isNotInList = true;
 
-        if (message != null && message.hasText()) {
+        User user;
+
+        for (User listOfUser : listOfUsers) {
+            if (listOfUser.getChatId().equals(message.getChatId().toString())) {
+                isNotInList = false;
+                listOfUser.get
+                break;
+            }
+        }
+
+        if(isNotInList) {
+            user = new User();
+            user.setChatId(message.getChatId().toString());
+            user.setBotState(BotState.Default);
+        }
+        BotState state = user.getBotState();
+
+
+        if (message.hasText()) {
             if (message.getText().equals("/start")) {
                 mainButtonsHolder(message, "Вас приветствует бот-помощник, который помогает улучшить организацию" +
-                        " учбеного процесса как студентов, так и преподователей. На клавиатуре выберите касту, " +
+                        " учбеного процесса как студентов, так и преподователей. На клавиатуре выберете касту, " +
                         "к котороый вы относитесь. ");
             }
+            if (message.getText().equals("/register_time")) {
+                user.setBotState(state.nextState());
+                try {
+                    execute(new SendMessage().setChatId(chatID).setText("Введите время:"));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            }
 
+            if (user.getBotState() == BotState.EnterTime) {
+                user.setScheduleTime(update.getMessage().getText());
+            }
 //            Timer timer = new Timer();
 
 //            timer.scheduleAtFixedRate(new WorkWithTime.CheckSchedule(), 0, 5000);
 
 
             SendMessage sendMessage = new SendMessage();
-
-            Password password = new Password(null);
-
 
             switch (message.getText()) {
                 case "Преподаватель": {
@@ -148,12 +182,10 @@ public class AssistantBot extends TelegramLongPollingBot {
         return "Student Assistant";
     }
 
-
     @Override
     public String getBotToken() {
         return "977643237:AAHWqxWnlzziPo2QSrLGhgzgO93ywV8eFN4";
     }
-
 
     public void teacherButtonsHolder(Message message) {
         SendMessage sendMessage = new SendMessage();
@@ -215,7 +247,6 @@ public class AssistantBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
-
 
     public void mainButtonsHolder(Message message, String text) {
         SendMessage sendMessage = new SendMessage();
