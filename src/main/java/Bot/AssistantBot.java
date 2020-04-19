@@ -1,5 +1,6 @@
 package Bot;
 
+import Student.Student;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -42,10 +43,10 @@ public class AssistantBot extends TelegramLongPollingBot {
     //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
     //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - ???
 
-    public void scheduleConfirm() {
+    public void scheduleConfirm(Student student) {
         try {
             execute(new SendPhoto()
-                    .setChatId("383625717")
+                    .setChatId(student.getUserId())
                     .setCaption("@ONPUStudentAssistantBot")
                     .setPhoto("https://i.imgur.com/khEWk4K.png"));
         } catch (TelegramApiException e) {
