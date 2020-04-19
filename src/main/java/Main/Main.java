@@ -2,6 +2,7 @@ package Main;
 
 import Bot.AssistantBot;
 import WorkWithTime.Run;
+import org.springframework.boot.SpringApplication;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;

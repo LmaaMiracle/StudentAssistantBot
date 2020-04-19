@@ -1,5 +1,7 @@
 package Bot;
 
+import State.Password;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -9,29 +11,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import State.Password;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Component
 public class AssistantBot extends TelegramLongPollingBot {
-
-    //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
-    //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - ???
-
-    public void scheduleConfirm() {
-        try {
-            execute(new SendPhoto()
-                    .setChatId("383625717")
-                    .setCaption("@ONPUStudentAssistantBot")
-                    .setPhoto("https://i.imgur.com/khEWk4K.png"));
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-
-    }
-
 
     public static final String lecturerNames = "" +
             "WEB:\n" +
@@ -55,6 +40,21 @@ public class AssistantBot extends TelegramLongPollingBot {
             "       • лекц., практ. — Рыбка Наталья Николаевна";
 
 
+    //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
+    //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - ???
+
+    public void scheduleConfirm() {
+        try {
+            execute(new SendPhoto()
+                    .setChatId("383625717")
+                    .setCaption("@ONPUStudentAssistantBot")
+                    .setPhoto("https://i.imgur.com/khEWk4K.png"));
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Override
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
@@ -68,6 +68,15 @@ public class AssistantBot extends TelegramLongPollingBot {
                         " учбеного процесса как студентов, так и преподователей. На клавиатуре выберете касту, " +
                         "к котороый вы относитесь. ");
             }
+            /*if (message.getText().equals("/register_time")) {
+                System.out.println(studentService);
+                studentService.addStudent(new Student(chatID, "18:00"));
+                try {
+                    execute(new SendMessage().setChatId(chatID).setText("arrr"));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            }*/
 
 //            Timer timer = new Timer();
 
