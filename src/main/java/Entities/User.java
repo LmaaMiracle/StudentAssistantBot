@@ -1,43 +1,27 @@
 package Entities;
 
 import State.BotState;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "users")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
+    @Id
+    @Column(name = "chat_id")
     private long chatId;
+
+    @Column(name = "bot_state")
+    @Enumerated(EnumType.STRING)
     private BotState botState;
+
+    @Column(name = "schedule_time")
     private String scheduleTime;
-
-    public User() {
-    }
-
-    public User(long chatId, BotState botState, String scheduleTime) {
-        this.chatId = chatId;
-        this.botState = botState;
-        this.scheduleTime = scheduleTime;
-    }
-
-    public long getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(long chatId) {
-        this.chatId = chatId;
-    }
-
-    public BotState getBotState() {
-        return botState;
-    }
-
-    public void setBotState(BotState botState) {
-        this.botState = botState;
-    }
-
-    public String getScheduleTime() {
-        return scheduleTime;
-    }
-
-    public void setScheduleTime(String scheduleTime) {
-        this.scheduleTime = scheduleTime;
-    }
 }

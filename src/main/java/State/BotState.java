@@ -59,12 +59,13 @@ public enum BotState {
 
     }
 
-    public  boolean isInputNeeded() {
+    public boolean isInputNeeded() {
         return inputNeeded;
     }
 
-    public void handleInput(AssistantBot bot){}
+    public void handleInput(AssistantBot bot) {}
 
     public abstract void enter(AssistantBot bot);
+
     public abstract BotState nextState();
 }

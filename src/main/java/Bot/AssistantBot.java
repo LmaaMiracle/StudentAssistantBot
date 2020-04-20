@@ -2,7 +2,6 @@ package Bot;
 
 import Entities.User;
 import State.BotState;
-import State.Password;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -20,7 +19,7 @@ import java.util.List;
 @Component
 public class AssistantBot extends TelegramLongPollingBot {
 
-    public  User user = new User(391582879, BotState.Default, null);
+    public User user = new User(391582879, BotState.Default, null);
 
     public static final String lecturerNames = "" +
             "WEB:\n" +
@@ -91,9 +90,6 @@ public class AssistantBot extends TelegramLongPollingBot {
 
 
             SendMessage sendMessage = new SendMessage();
-
-            Password password = new Password(null);
-
 
             switch (message.getText()) {
                 case "Преподаватель": {
