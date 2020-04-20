@@ -19,7 +19,7 @@ import java.util.List;
 @Component
 public class AssistantBot extends TelegramLongPollingBot {
 
-    public User user = new User(391582879, BotState.Default, null);
+    public static final ArrayList<User> listOfUsers = new ArrayList<>();
 
     public static final String lecturerNames = "" +
             "WEB:\n" +
@@ -46,7 +46,7 @@ public class AssistantBot extends TelegramLongPollingBot {
     //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
     //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - 391582879
 
-    public void scheduleConfirm() {
+    public void scheduleConfirm(User user) {
         try {
             execute(new SendPhoto()
                     .setChatId(user.getChatId())
@@ -64,9 +64,28 @@ public class AssistantBot extends TelegramLongPollingBot {
 
         Long chatID = update.getMessage().getChatId();
 
+        boolean isNotInList = true;
+
+        User user = null;
+
+        for (User user1 : listOfUsers) {
+            if (user1.getChatId() == message.getChatId()) {
+                isNotInList = false;
+                user = user1;
+                break;
+            }
+        }
+
+        if(isNotInList) {
+            user = new User();
+            user.setChatId(message.getChatId());
+            user.setBotState(BotState.Default);
+            listOfUsers.add(user);
+        }
         BotState state = user.getBotState();
 
-        if (message != null && message.hasText()) {
+
+        if (message.hasText()) {
             if (message.getText().equals("/start")) {
                 mainButtonsHolder(message, "Вас приветствует бот-помощник, который помогает улучшить организацию" +
                         " учбеного процесса как студентов, так и преподователей. На клавиатуре выберете касту, " +
@@ -79,10 +98,14 @@ public class AssistantBot extends TelegramLongPollingBot {
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
-            }
-
-            if (user.getBotState() == BotState.EnterTime) {
+            } else if (user.getBotState() == BotState.EnterTime) {
                 user.setScheduleTime(update.getMessage().getText());
+                user.setBotState(state.nextState());
+                try {
+                    execute(new SendMessage().setChatId(chatID).setText("Уведомление придет в " + user.getScheduleTime()));
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
             }
 //            Timer timer = new Timer();
 

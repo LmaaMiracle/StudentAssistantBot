@@ -1,13 +1,15 @@
 package Main;
 
-import DAO.UsersDAOImpl;
-import Entities.User;
-import State.BotState;
+import Bot.AssistantBot;
+import WorkWithTime.Run;
+import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class Main {
     public static void main(String[] args) {
 
-        /*ApiContextInitializer.init();
+        ApiContextInitializer.init();
 
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
@@ -17,11 +19,6 @@ public class Main {
             e.printStackTrace();
         }
 
-        Run.run();*/
-
-        UsersDAOImpl usersDAO = new UsersDAOImpl();
-
-        usersDAO.save(new User(21, BotState.Default, "10:30"));
-        usersDAO.save(new User(22, BotState.EnterTime, "13:45"));
+        Run.run();
     }
 }
