@@ -55,9 +55,7 @@ public enum BotState {
         return states[id];
     }
 
-    protected void sendMessage(AssistantBot bot, String text) {
-
-    }
+    protected void sendMessage(AssistantBot bot, String text) {}
 
     public boolean isInputNeeded() {
         return inputNeeded;

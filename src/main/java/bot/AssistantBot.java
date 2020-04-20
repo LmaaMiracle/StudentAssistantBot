@@ -1,9 +1,6 @@
 package bot;
 
 import entity.User;
-import org.hibernate.metadata.ClassMetadata;
-import service.UserService;
-import state.BotState;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -13,7 +10,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import util.HibernateSessionFactoryUtil;
+import service.UserService;
+import state.BotState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +19,6 @@ import java.util.List;
 public class AssistantBot extends TelegramLongPollingBot {
 
     private final UserService userService = new UserService();
-
-    public static final ArrayList<User> listOfUsers = new ArrayList<>();
 
     public static final String lecturerNames = "" +
             "WEB:\n" +
@@ -45,12 +41,6 @@ public class AssistantBot extends TelegramLongPollingBot {
             "Философия:\n" +
             "       • лекц., практ. — Рыбка Наталья Николаевна";
 
-/*
-    chatID
-        Дима: 644026470
-        Саша: 383625717
-        Кирилл: 391582879
-*/
 
     public void sendSchedule(User user) {
         try {
@@ -100,13 +90,9 @@ public class AssistantBot extends TelegramLongPollingBot {
                 }
                 userService.saveOrUpdateUser(user);
             }
-//            Timer timer = new Timer();
-
-//            timer.scheduleAtFixedRate(new WorkWithTime.CheckSchedule(), 0, 5000);
 
             switch (message.getText()) {
                 case "Преподаватель": {
-//                    password.update(update);
                     teacherButtonsHolder(message);
                     break;
                 }
