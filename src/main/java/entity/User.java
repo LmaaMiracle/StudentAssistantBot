@@ -1,6 +1,6 @@
-package Entities;
+package entity;
 
-import State.BotState;
+import state.BotState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,8 +25,14 @@ public class User {
     @Column(name = "schedule_time")
     private String scheduleTime;
 
+
     public User(long chatId, BotState botState) {
         this.chatId = chatId;
         this.botState = botState;
     }
+
+    /*@Override
+    public boolean equals(Object o) {
+
+    }*/
 }

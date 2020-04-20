@@ -1,9 +1,9 @@
-package Bot;
+package bot;
 
-import Entities.User;
-import Services.UserService;
-import State.BotState;
-import org.springframework.stereotype.Component;
+import entity.User;
+import org.hibernate.metadata.ClassMetadata;
+import service.UserService;
+import state.BotState;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -13,11 +13,11 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import util.HibernateSessionFactoryUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
 public class AssistantBot extends TelegramLongPollingBot {
 
     private final UserService userService = new UserService();
@@ -45,9 +45,12 @@ public class AssistantBot extends TelegramLongPollingBot {
             "Философия:\n" +
             "       • лекц., практ. — Рыбка Наталья Николаевна";
 
-
-    //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
-    //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - 391582879
+/*
+    chatID
+        Дима: 644026470
+        Саша: 383625717
+        Кирилл: 391582879
+*/
 
     public void sendSchedule(User user) {
         try {
@@ -65,37 +68,13 @@ public class AssistantBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
 
         Message message = update.getMessage();
-
         Long chatId = message.getChatId();
 
-        /*boolean isNotInList = true;
-
-        User user = null;
-
-        for (User user1 : listOfUsers) {
-            if (user1.getChatId() == message.getChatId()) {
-                isNotInList = false;
-                user = user1;
-                break;
-            }
-        }
-
-        if(isNotInList) {
-            user = new User();
-            user.setChatId(message.getChatId());
-            user.setBotState(BotState.Default);
-            listOfUsers.add(user);
-        }
-        BotState state = user.getBotState();*/
-
         User user = userService.findUserById(chatId);
-
         if (user == null) {
             user = new User(chatId, BotState.Default);
         }
-
         BotState state = user.getBotState();
-
 
         if (message.hasText()) {
             if (message.getText().equals("/start")) {

@@ -1,6 +1,6 @@
-package State;
+package state;
 
-import Bot.AssistantBot;
+import bot.AssistantBot;
 
 public enum BotState {
 

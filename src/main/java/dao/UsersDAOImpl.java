@@ -1,7 +1,7 @@
-package DAO;
+package dao;
 
-import Entities.User;
-import Utils.HibernateSessionFactoryUtil;
+import entity.User;
+import util.HibernateSessionFactoryUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -11,7 +11,10 @@ public class UsersDAOImpl implements UsersDAO {
 
     @Override
     public User findById(long id) {
-        return HibernateSessionFactoryUtil.getSessionFactory().openSession().get(User.class, id);
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        User user = session.get(User.class, id);
+        session.close();
+        return user;
     }
 
     @Override
@@ -43,15 +46,18 @@ public class UsersDAOImpl implements UsersDAO {
 
     @Override
     public List<User> findAll() {
-        return (List<User>) HibernateSessionFactoryUtil.getSessionFactory().openSession().createQuery("From User").list();
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        List<User> userList = session.createQuery("FROM User").list();
+        session.close();
+        return userList;
     }
 
     @Override
     public void saveOrUpdate(User user) {
-        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        Transaction transaction = session.beginTransaction();
-        session.saveOrUpdate(user);
-        transaction.commit();
-        session.close();
+        if (findById(user.getChatId()) == null) {
+            save(user);
+        } else {
+            update(user);
+        }
     }
 }
