@@ -45,4 +45,13 @@ public class UsersDAOImpl implements UsersDAO {
     public List<User> findAll() {
         return (List<User>) HibernateSessionFactoryUtil.getSessionFactory().openSession().createQuery("From User").list();
     }
+
+    @Override
+    public void saveOrUpdate(User user) {
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        session.saveOrUpdate(user);
+        transaction.commit();
+        session.close();
+    }
 }

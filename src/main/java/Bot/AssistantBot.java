@@ -1,6 +1,7 @@
 package Bot;
 
 import Entities.User;
+import Services.UserService;
 import State.BotState;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -18,6 +19,8 @@ import java.util.List;
 
 @Component
 public class AssistantBot extends TelegramLongPollingBot {
+
+    private final UserService userService = new UserService();
 
     public static final ArrayList<User> listOfUsers = new ArrayList<>();
 
@@ -46,7 +49,7 @@ public class AssistantBot extends TelegramLongPollingBot {
     //чтобы протестить для себя нужно в setChatID добавить ваш тг-айди, получить его можно в этом боте: @userinfobot
     //айдишники: Дима - 644026470, Саша - 383625717, Кирилл - 391582879
 
-    public void scheduleConfirm(User user) {
+    public void sendSchedule(User user) {
         try {
             execute(new SendPhoto()
                     .setChatId(user.getChatId())
@@ -60,11 +63,12 @@ public class AssistantBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+
         Message message = update.getMessage();
 
-        Long chatID = update.getMessage().getChatId();
+        Long chatId = message.getChatId();
 
-        boolean isNotInList = true;
+        /*boolean isNotInList = true;
 
         User user = null;
 
@@ -82,6 +86,14 @@ public class AssistantBot extends TelegramLongPollingBot {
             user.setBotState(BotState.Default);
             listOfUsers.add(user);
         }
+        BotState state = user.getBotState();*/
+
+        User user = userService.findUserById(chatId);
+
+        if (user == null) {
+            user = new User(chatId, BotState.Default);
+        }
+
         BotState state = user.getBotState();
 
 
@@ -92,27 +104,26 @@ public class AssistantBot extends TelegramLongPollingBot {
                         "к котороый вы относитесь. ");
             }
             if (message.getText().equals("/register_time")) {
-                user.setBotState(state.nextState());
                 try {
-                    execute(new SendMessage().setChatId(chatID).setText("Введите время:"));
+                    execute(new SendMessage().setChatId(chatId).setText("Введите время:"));
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
-            } else if (user.getBotState() == BotState.EnterTime) {
-                user.setScheduleTime(update.getMessage().getText());
+                user.setBotState(state.nextState());
+                userService.saveOrUpdateUser(user);
+            } else if (state == BotState.EnterTime) {
+                user.setScheduleTime(message.getText());
                 user.setBotState(state.nextState());
                 try {
-                    execute(new SendMessage().setChatId(chatID).setText("Уведомление придет в " + user.getScheduleTime()));
+                    execute(new SendMessage().setChatId(chatId).setText("Уведомление придет в " + user.getScheduleTime()));
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }
+                userService.saveOrUpdateUser(user);
             }
 //            Timer timer = new Timer();
 
 //            timer.scheduleAtFixedRate(new WorkWithTime.CheckSchedule(), 0, 5000);
-
-
-            SendMessage sendMessage = new SendMessage();
 
             switch (message.getText()) {
                 case "Преподаватель": {

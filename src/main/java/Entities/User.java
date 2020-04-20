@@ -24,4 +24,9 @@ public class User {
 
     @Column(name = "schedule_time")
     private String scheduleTime;
+
+    public User(long chatId, BotState botState) {
+        this.chatId = chatId;
+        this.botState = botState;
+    }
 }

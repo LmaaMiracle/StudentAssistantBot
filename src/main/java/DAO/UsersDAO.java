@@ -15,4 +15,6 @@ public interface UsersDAO {
     public User findById(long id);
 
     public List<User> findAll();
+
+    public void saveOrUpdate(User user);
 }
