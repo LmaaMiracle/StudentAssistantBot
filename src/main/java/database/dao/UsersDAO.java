@@ -1,6 +1,6 @@
-package dao;
+package database.dao;
 
-import entity.User;
+import database.entity.User;
 
 import java.util.List;
 

@@ -1,7 +1,8 @@
-package dao;
+package database.dao;
 
-import entity.User;
-import util.HibernateSessionFactoryUtil;
+import database.dao.UsersDAO;
+import database.entity.User;
+import database.util.HibernateSessionFactoryUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 

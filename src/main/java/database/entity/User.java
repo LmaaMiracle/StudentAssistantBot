@@ -1,4 +1,4 @@
-package entity;
+package database.entity;
 
 import state.BotState;
 import lombok.AllArgsConstructor;

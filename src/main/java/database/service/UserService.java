@@ -1,7 +1,7 @@
-package service;
+package database.service;
 
-import dao.UsersDAOImpl;
-import entity.User;
+import database.dao.UsersDAOImpl;
+import database.entity.User;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
-package util;
+package database.util;
 
-import entity.User;
+import database.entity.User;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
