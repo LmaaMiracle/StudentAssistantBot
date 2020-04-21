@@ -8,7 +8,7 @@ public class Run {
 
     public static void run() {
         ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
-        scheduledExecutorService.scheduleAtFixedRate(new CheckSchedule(), 0, 60, TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleAtFixedRate(new ScheduleController(), 0, 60, TimeUnit.SECONDS);
     }
 
 }

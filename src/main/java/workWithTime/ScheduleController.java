@@ -8,10 +8,13 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-public class CheckSchedule extends TimerTask {
+public class ScheduleController extends TimerTask {
 
-    private final AssistantBot bot = new AssistantBot();
+    private final AssistantBot bot = AssistantBot.getInstance();
     private final UserService userService = new UserService();
 
     @Override
@@ -24,5 +27,10 @@ public class CheckSchedule extends TimerTask {
                 bot.sendSchedule(user);
             }
         }
+    }
+
+    public void start() {
+        ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
+        scheduledExecutorService.scheduleAtFixedRate(this, 0, 60, TimeUnit.SECONDS);
     }
 }

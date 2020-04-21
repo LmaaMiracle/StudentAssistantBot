@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import service.UserService;
 import state.BotState;
+import workWithTime.ScheduleController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,18 @@ public class AssistantBot extends TelegramLongPollingBot {
             "Философия:\n" +
             "       • лекц., практ. — Рыбка Наталья Николаевна";
 
+    private static AssistantBot bot;
+
+
+    private AssistantBot() {}
+
+    public static AssistantBot getInstance() {
+        if (bot == null) {
+            bot = new AssistantBot();
+            new ScheduleController().start();
+        }
+        return bot;
+    }
 
     public void sendSchedule(User user) {
         try {
