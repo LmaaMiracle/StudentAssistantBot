@@ -253,5 +253,3 @@ public class AssistantBot extends TelegramLongPollingBot {
     }
 
 }
-
-
