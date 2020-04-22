@@ -78,10 +78,11 @@ public class AssistantBot extends TelegramLongPollingBot {
             state = state.nextState();
         }
 
-        for (int i = 0; i < 100; i++) {
+        /*for (int i = 0; i < 100; i++) {
             System.out.println(state);
         }
-        System.out.println(state.isNewState());
+        System.out.println(state.isNewState());*/
+
         if (state != null && state.isNewState()) {
             state.enter(user, update.getMessage());
         }
