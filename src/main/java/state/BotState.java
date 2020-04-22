@@ -28,18 +28,18 @@ public enum BotState {
             switch (text) {
                 case Command.STUDENT:
                     next = BotState.StudentRegistration;
-                    newState = true;
+                    next.newState = true;
                     break;
                 case Command.TEACHER:
                     next = BotState.TeacherRegistration;
-                    newState = true;
+                    next.newState = true;
                     break;
                 default:
                     sendMessage(new SendMessage()
                             .setChatId(user.getChatId())
                             .setText("Такого выбора нет, попробуйте ещё раз"));
                     next = BotState.Start;
-                    newState = false;
+                    next.newState = false;
             }
         }
 
@@ -66,11 +66,10 @@ public enum BotState {
             correctInput = true;
             if (correctInput) {
                 next = BotState.Student;
-                newState = true;
-
+                next.newState = true;
             } else {
                 next = BotState.StudentRegistration;
-                newState = false;
+                next.newState = false;
             }
         }
 
@@ -97,10 +96,10 @@ public enum BotState {
             correctInput = true;
             if (correctInput) {
                 next = BotState.Teacher;
-                newState = true;
+                next.newState = true;
             } else {
                 next = BotState.StudentRegistration;
-                newState = false;
+                next.newState = false;
             }
         }
 
@@ -129,7 +128,7 @@ public enum BotState {
                             .setCaption("@ONPUStudentAssistantBot")
                             .setPhoto("https://i.imgur.com/khEWk4K.png"));
                     next = BotState.Student;
-                    newState = false;
+                    next.newState = false;
                     break;
                 case Command.CALL_SCHEDULE:
                     sendMessage(new SendPhoto()
@@ -137,25 +136,25 @@ public enum BotState {
                             .setCaption("@ONPUStudentAssistantBot")
                             .setPhoto("https://i.imgur.com/dhW3riD.png"));
                     next = BotState.Student;
-                    newState = false;
+                    next.newState = false;
                     break;
                 case Command.TEACHER_LIST:
                     sendMessage(new SendMessage()
                             .setChatId(user.getChatId())
                             .setText(AssistantBot.lecturerNames));
                     next = BotState.Student;
-                    newState = false;
+                    next.newState = false;
                     break;
                 case Command.REGISTER_TIME:
                     next = BotState.EnterTime;
-                    newState = true;
+                    next.newState = true;
                     break;
                 default:
                     sendMessage(new SendMessage()
                             .setChatId(user.getChatId())
                             .setText("Такого выбора нет, попробуйте ещё раз"));
                     next = BotState.Student;
-                    newState = false;
+                    next.newState = false;
             }
         }
 
@@ -184,7 +183,7 @@ public enum BotState {
                             .setCaption("@ONPUStudentAssistantBot")
                             .setPhoto("https://i.imgur.com/3sQvSQ8.png"));
                     next = BotState.Teacher;
-                    newState = false;
+                    next.newState = false;
                     break;
                 case Command.CALL_SCHEDULE:
                     sendMessage(new SendPhoto()
@@ -192,18 +191,18 @@ public enum BotState {
                             .setCaption("@ONPUStudentAssistantBot")
                             .setPhoto("https://i.imgur.com/dhW3riD.png"));
                     next = BotState.Teacher;
-                    newState = false;
+                    next.newState = false;
                     break;
                 case Command.REGISTER_TIME:
                     next = BotState.EnterTime;
-                    newState = true;
+                    next.newState = true;
                     break;
                 default:
                     sendMessage(new SendMessage()
                             .setChatId(user.getChatId())
                             .setText("Такого выбора нет, попробуйте ещё раз"));
                     next = BotState.Teacher;
-                    newState = false;
+                    next.newState = false;
             }
         }
 
@@ -230,10 +229,10 @@ public enum BotState {
             if (correctInput) {
                 user.setScheduleTime(text);
                 next = BotState.Start;
-                newState = true;
+                next.newState = true;
             } else {
                 next = BotState.Start;
-                newState = true;
+                next.newState = true;
             }
         }
 
