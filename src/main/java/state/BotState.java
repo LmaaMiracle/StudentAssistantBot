@@ -3,7 +3,7 @@ package state;
 import bot.AssistantBot;
 import bot.ButtonsHolder;
 import bot.Command;
-import database.entity.Group;
+import bot.InlineHolder;
 import database.entity.Member;
 import database.entity.Student;
 import database.entity.User;
@@ -11,7 +11,9 @@ import database.service.GroupService;
 import database.service.UserService;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public enum BotState {
@@ -21,14 +23,85 @@ public enum BotState {
 
         @Override
         public void sendResponse(Message message) {
-            sendMessage(new ButtonsHolder().
-                    setMainMenuKeyboard(message).
-                    setText("Вас приветствует бот-помощник, который помогает улучшить организацию " +
-                            "учебного процесса как студентов, так и преподователей. На клавиатуре выберете касту, " +
-                            "к котороый вы относитесь."));
+            sendMessage(new SendMessage().setChatId(message.getChatId()).setText("\n     Добро пожаловать \uD83D\uDE42 \n" +
+                    "    Я был создан с целью помочь человечеству улучшить учебный процесс.\n" +
+                    "    Я буду полезен как преподавателям, так и студентам. Моя главная задача — помочь и не сломаться \uD83D\uDC7E." +
+                    "\n   Я ещё развиваюсь и поэтому жду твои пожелания и замечания! \n\n" +
+                    "   Оставить отзыв, просмотреть " +
+                    "контактную информацию, а также ознакомиться с инструкцией можно выбрав кнопку 'ℹ️ Info'.\n ")
+                    .setReplyMarkup(new InlineHolder().getInlineKeyboardMarkup(message)));
         }
 
         @Override
+        public void handleInput(User user, Update update) {
+            AssistantBot bot = AssistantBot.getInstance();
+            if (update.hasCallbackQuery()) {
+                System.out.println("asdasdsad");
+
+                String callData = update.getCallbackQuery().getData();
+                int messageId = update.getCallbackQuery().getMessage().getMessageId();
+                long chatId = update.getCallbackQuery().getMessage().getChatId();
+
+                if (callData.equals("info")) {
+                    String answer = " Я был создан тремя обычными студентами, они обо мне то и заботятся." +
+                            " Всё что есть во мне - их рук дело.\n" +
+                            " Если хотите дать свой фидбек пишшите комму-то из них в tg:" +
+                            "\n Александр Ярчук: @lmaa19\n Дмитрий Шматков: @Dima_Sh_2001\n" +
+                            " Кирилл Беляев: @arShoKaBo\n " +
+                            "Почта бота: student_ass@gmail.com\n\n" +
+                            " Немного о функционале: \n" +
+                            "-Есть кнопки с разного рода инфой. Это расписание пар/ расписание звонков/ список преподавателей твоей группы и т.д. С этим не должно быть проблем.\n" +
+                            "-Есть главная фича - это рассылка твоего расписания пар в указанное тобой время. \n" +
+                            "Для этого выбери кнопку \"Время увидомления\", после чего получишь просьбу о вводе" +
+                            " времени в формате \"HH:mm\", отправь мне удобное тебе время и я не забуду тебе напомнить " +
+                            "о твоих парах!\n\n" +
+                            "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты. И далее тебе " +
+                            "придётся пройти небольшую аутентификацию.";
+
+                    sendMessage(new ButtonsHolder().setMainMenuKeyboard(update.getCallbackQuery().getMessage()).setText("Удачи! Я с тобой :)"));
+
+                    EditMessageText editMessageText = new EditMessageText()
+                            .setChatId(chatId)
+                            .setMessageId(messageId)
+                            .setText(answer);
+
+                    next = BotState.Start;
+                    next.responseNeeded = false;
+
+                    try {
+                        bot.execute(editMessageText);
+                    } catch (TelegramApiException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return;
+            }
+
+            System.out.println("got here");
+
+            System.out.println(update.getMessage().getText());
+            System.out.println(update.getMessage().getText().equals(Command.STUDENT));
+
+            switch (update.getMessage().getText()) {
+                case Command.STUDENT:
+                    next = BotState.StudentRegistration;
+                    next.responseNeeded = true;
+                    break;
+                case Command.LECTURER:
+                    next = BotState.LecturerRegistration;
+                    next.responseNeeded = true;
+                    break;
+                default:
+                    sendMessage(new SendMessage()
+                            .setChatId(user.getChatId())
+                            .setText("Такого выбора нет, попробуйте ещё раз"));
+                    next = BotState.Start;
+                    next.responseNeeded = false;
+
+            }
+        }
+
+        /*@Override
         public void handleInput(User user, String text) {
             switch (text) {
                 case Command.STUDENT:
@@ -46,7 +119,7 @@ public enum BotState {
                     next = BotState.Start;
                     next.responseNeeded = false;
             }
-        }
+        }*/
 
         @Override
         public BotState nextState() {
@@ -66,10 +139,10 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(User user, String text) {
+        public void handleInput(User user, Update update) {
             UserService userService = getUserService();
             GroupService groupService = getGroupService();
-            if (groupService.getGroupNameSet().contains(text)) {
+            if (groupService.getGroupNameSet().contains(update.getMessage().getText())) {
                 next = BotState.Student;
                 next.responseNeeded = true;
 
@@ -77,7 +150,7 @@ public enum BotState {
                 Student student = new Student();
                 student.setBotState(user.getBotState());
                 student.setChatId(user.getChatId());
-                student.setGroup(groupService.findGroupByName(text));
+                student.setGroup(groupService.findGroupByName(update.getMessage().getText()));
                 userService.saveUser(student);
             } else {
                 next = BotState.StudentRegistration;
@@ -92,6 +165,7 @@ public enum BotState {
     },
 
     LecturerRegistration {
+
         private BotState next;
         private boolean correctInput;
 
@@ -103,7 +177,7 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(User user, String text) {
+        public void handleInput(User user, Update update) {
             // Сюда записывать фамилию и тут его заносить в бд
             correctInput = true;
             if (correctInput) {
@@ -132,9 +206,9 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(User user, String text) {
+        public void handleInput(User user, Update update) {
             Student student = (Student) user;
-            switch (text) {
+            switch (update.getMessage().getText()) {
                 case Command.SEND_GROUP_SCHEDULE:
                     sendMessage(new SendPhoto()
                             .setChatId(user.getChatId())
@@ -188,8 +262,8 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(User user, String text) {
-            switch (text) {
+        public void handleInput(User user, Update update) {
+            switch (update.getMessage().getText()) {
                 case Command.LECTURER_SCHEDULE:
                     sendMessage(new SendPhoto()
                             .setChatId(user.getChatId())
@@ -237,14 +311,15 @@ public enum BotState {
         }
 
         @Override
-        public void handleInput(User user, String text) {
+        public void handleInput(User user, Update update) {
             if (!(user instanceof Member)) {
                 return;
             }
-            Member member = (Member) user;;
+            Member member = (Member) user;
+            ;
             correctInput = true;
             if (correctInput) {
-                member.setScheduleTime(text);
+                member.setScheduleTime(update.getMessage().getText());
                 next = BotState.Start;
                 next.responseNeeded = true;
             } else {
@@ -300,8 +375,7 @@ public enum BotState {
         }
     }
 
-
-    public abstract void handleInput(User user, String text);
+    public abstract void handleInput(User user, Update update);
 
     public abstract void sendResponse(Message message);
 

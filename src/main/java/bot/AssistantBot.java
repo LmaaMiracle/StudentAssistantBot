@@ -64,38 +64,47 @@ public class AssistantBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         Message message = update.getMessage();
 
-        if (message == null || !message.hasText()) {
+        if (message != null && message.hasText()) {
+            String messageText = message.getText();
+            long chatId = message.getChatId();
+            User user = userService.findUserByChatId(chatId);
+
+            BotState botState;
+
+            if (messageText.equals(Command.START) || messageText.equals(Command.RESTART) || user == null) {
+                if (user != null) {
+                    userService.deleteUser(user);
+                }
+                botState = BotState.Start;
+                botState.setResponseNeeded(true);
+
+                user = new Guest();
+                user.setChatId(chatId);
+                user.setBotState(botState);
+            } else {
+
+
+                botState = user.getBotState();
+                botState.handleInput(user, update);
+                botState = botState.nextState();
+            }
+
+            if (botState.isResponseNeeded()) {
+                botState.sendResponse(message);
+            }
+            user.setBotState(botState);
+            System.out.println("Next state: " + botState);
+            userService.saveOrUpdateUser(user);
+
             return;
         }
 
-        String messageText = message.getText();
-        long chatId = message.getChatId();
-        User user = userService.findUserByChatId(chatId);
+        if (update.hasCallbackQuery()) {
+            BotState botState = BotState.Start;
 
-
-        BotState botState;
-        if (messageText.equals(Command.START) || messageText.equals(Command.RESTART)) {
-            if (user != null) {
-                userService.deleteUser(user);
-            }
-            botState = BotState.Start;
-            botState.setResponseNeeded(true);
-
-            user = new Guest();
-            user.setChatId(chatId);
-            user.setBotState(botState);
-        } else {
-            botState = user.getBotState();
-            botState.handleInput(user, messageText);
-            botState = botState.nextState();
+            botState.handleInput(new User(), update);
         }
 
-        if (botState.isResponseNeeded()) {
-            botState.sendResponse(message);
-        }
-        user.setBotState(botState);
-        System.out.println("Next state: " + botState);
-        userService.saveOrUpdateUser(user);
     }
 
     @Override
