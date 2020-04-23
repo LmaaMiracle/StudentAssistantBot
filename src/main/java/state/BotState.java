@@ -16,6 +16,8 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.regex.Pattern;
+
 public enum BotState {
 
     Start {
@@ -292,14 +294,13 @@ public enum BotState {
 
     EnterTime {
         private BotState next;
-        private boolean correctInput;
 
         @Override
         public void handleInput(User user, Update update) {
             if (user instanceof Member) {
                 Member member = (Member) user;
-                correctInput = true;
-                if (correctInput) {
+                Pattern pattern = Pattern.compile("([01]?[0-9]|2[0-3]):[0-5][0-9]");
+                if (pattern.matcher(update.getMessage().getText()).matches()) {
                     member.setScheduleTime(update.getMessage().getText());
                     getUserService().updateUser(member);
                     next = BotState.Student;
