@@ -4,6 +4,7 @@ import database.entity.Group;
 import database.util.HibernateSessionFactoryUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.List;
 

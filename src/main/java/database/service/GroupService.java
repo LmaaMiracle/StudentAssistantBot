@@ -2,6 +2,7 @@ package database.service;
 
 import database.dao.GroupDAOImpl;
 import database.entity.Group;
+import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.util.HashSet;
 import java.util.List;

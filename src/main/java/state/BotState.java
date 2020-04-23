@@ -34,7 +34,7 @@ public enum BotState {
             }
             sendMessage(new SendMessage().
                     setChatId(update.getMessage().getChatId()).
-                    setText("Нажмите info, pls"));
+                    setText("Сперва прочтите info!"));
             next = BotState.Start;
             next.responseNeeded = false;
         }
@@ -81,19 +81,20 @@ public enum BotState {
 
         @Override
         public void sendResponse(Message message) {
-            String answer = " Я был создан тремя обычными студентами, они обо мне то и заботятся." +
-                    " Всё что есть во мне - их рук дело.\n" +
-                    " Если хотите дать свой фидбек пишшите комму-то из них в tg:" +
-                    "\n Александр Ярчук: @lmaa19\n Дмитрий Шматков: @Dima_Sh_2001\n" +
-                    " Кирилл Беляев: @arShoKaBo\n " +
+            String answer = "Я был создан тремя обычными студентами, они обо мне-то и заботятся. " +
+                    "Всё что есть во мне — их рук дело.\n" +
+                    "Если хотите дать свой фидбек пишите кому-то из них:\n" +
+                    "Александр Ярчук: @lmaa19\nДмитрий Шматков: @Dima_Sh_2001\n" +
+                    "Кирилл Беляев: @arShoKaBo\n" +
                     "Почта бота: student_ass@gmail.com\n\n" +
-                    " Немного о функционале: \n" +
-                    "-Есть кнопки с разного рода инфой. Это расписание пар/ расписание звонков/ список преподавателей твоей группы и т.д. С этим не должно быть проблем.\n" +
-                    "-Есть главная фича - это рассылка твоего расписания пар в указанное тобой время. \n" +
-                    "Для этого выбери кнопку \"Время увидомления\", после чего получишь просьбу о вводе" +
-                    " времени в формате \"HH:mm\", отправь мне удобное тебе время и я не забуду тебе напомнить " +
+                    "Немного о функционале: \n" +
+                    "▪️Есть кнопки с разного рода инфой. Это расписание пар/расписание звонков/список преподавателей" +
+                    "твоей группы и т.д., c этим не должно быть проблем.\n" +
+                    "▪️Есть главная фича — это рассылка твоего расписания пар в указанное тобой время. \n" +
+                    "Для этого выбери кнопку \"Время уведомления\", после чего получишь просьбу о вводе " +
+                    "времени в формате \"HH:mm\", отправь мне удобное тебе время, и я не забуду тебе напомнить " +
                     "о твоих парах!\n\n" +
-                    "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты. И далее тебе " +
+                    "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты, и далее тебе " +
                     "придётся пройти небольшую аутентификацию.";
 
             sendMessage(new EditMessageText()
@@ -151,7 +152,7 @@ public enum BotState {
         public void sendResponse(Message message) {
             sendMessage(new SendMessage().
                     setChatId(message.getChatId()).
-                    setText("Введите название группы"));
+                    setText("Введите название группы (например АИ-182)"));
         }
 
         @Override
@@ -221,6 +222,17 @@ public enum BotState {
                     next = BotState.EnterTime;
                     next.responseNeeded = true;
                     break;
+                case Command.GET_HELP:
+                    sendMessage(new SendMessage().setChatId(update.getMessage().getChatId()).setText("▪️Если у тебя " +
+                            "возникли проблемы или ты неправильно ввёл свою группу, можешь меня перезапустить " +
+                            "командой /restart \n" +
+                            "▪️Время рассылки расписания вводится в формате HH:mm (24h). Ты жмёшь на кнопку, бот даёт " +
+                            "запрос на ввод времени, после чего вводи удобное тебе время! \n" +
+                            "▪️Группа вводится в Политех-формате (АИ-181)\n" +
+                            "▪️Если всё полетело пиши @lmaa19 / @arShoKaBo / @Dima_Sh_2001 или на почту student_ass@gmail.com\n"));
+                    next = BotState.Student;
+                    next.responseNeeded = false;
+                    break;
                 default:
                     sendMessage(new SendMessage()
                             .setChatId(user.getChatId())
@@ -232,8 +244,9 @@ public enum BotState {
 
         @Override
         public void sendResponse(Message message) {
+            User student = getUserService().findUserByChatId(message.getChatId());
             sendMessage(new SendMessage().
-                    setText("Вы студент группы Ар-шо-каво. Вы можете делать это: ").
+                    setText("Вы вошли как студент группы " + ((Student) student).getGroup().getGroupName()).
                     setChatId(message.getChatId()).
                     enableMarkdown(true).
                     setReplyMarkup(new ButtonsHolder().setStudentKeyboard()));
@@ -305,6 +318,8 @@ public enum BotState {
                     getUserService().updateUser(member);
                     next = BotState.Student;
                     next.responseNeeded = false;
+                    sendMessage(new SendMessage().setChatId(update.getMessage().getChatId())
+                            .setText("Отлично! Расаписание придёт в " + update.getMessage().getText()));
                 } else {
                     SendMessage message = new SendMessage();
                     message.setChatId(update.getMessage().getChatId());
@@ -321,7 +336,7 @@ public enum BotState {
         public void sendResponse(Message message) {
             sendMessage(new SendMessage().
                     setChatId(message.getChatId()).
-                    setText("Введите время"));
+                    setText("Введите время (например 08:30)"));
         }
 
         @Override

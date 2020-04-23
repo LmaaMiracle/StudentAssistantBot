@@ -19,7 +19,6 @@ public class ButtonsHolder {
 
     public ReplyKeyboardMarkup setMainMenuKeyboard() {
         setSettings(true);
-
         keyboard.add(new KeyboardRow());
         keyboard.get(0).add(new KeyboardButton(Command.LECTURER));
         keyboard.get(0).add(new KeyboardButton(Command.STUDENT));
@@ -35,11 +34,14 @@ public class ButtonsHolder {
         keyboard.add(new KeyboardRow());
         keyboard.get(0).add(new KeyboardButton(Command.GET_GROUP_SCHEDULE));
         keyboard.add(new KeyboardRow());
-        keyboard.get(1).add(new KeyboardButton(Command.GET_CALL_SCHEDULE));
+        keyboard.get(0).add(new KeyboardButton(Command.GET_CALL_SCHEDULE));
         keyboard.add(new KeyboardRow());
-        keyboard.get(2).add(new KeyboardButton(Command.GET_LECTURER_LIST));
+        keyboard.get(1).add(new KeyboardButton(Command.GET_LECTURER_LIST));
         keyboard.add(new KeyboardRow());
-        keyboard.get(3).add(new KeyboardButton(Command.REGISTER_TIME));
+        keyboard.get(2).add(new KeyboardButton(Command.REGISTER_TIME));
+        keyboard.add(new KeyboardRow());
+        keyboard.get(3  ).add(new KeyboardButton(Command.GET_HELP));
+
 
         replyKeyboardMarkup.setKeyboard(keyboard);
 

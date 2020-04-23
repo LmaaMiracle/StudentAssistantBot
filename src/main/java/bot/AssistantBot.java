@@ -3,7 +3,6 @@ package bot;
 import database.entity.*;
 import database.service.UserService;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -80,26 +79,30 @@ public class AssistantBot extends TelegramLongPollingBot {
 
             BotState botState;
 
-            if (messageText.equals(Command.START) || messageText.equals(Command.RESTART) || user == null) {
-                if (user != null) {
+            switch (messageText) {
+                case Command.START:
+                case Command.RESTART:
                     userService.deleteUser(user);
-                }
-                botState = BotState.Start;
 
-                user = new Guest();
-                user.setChatId(chatId);
-                user.setBotState(botState);
+                    botState = BotState.Start;
+                    botState.sendResponse(message);
 
-                userService.saveUser(user);
-            } else {
-                botState = user.getBotState();
-                botState.handleInput(user, update);
-                botState = botState.nextState();
+                    user = new Guest();
+                    user.setChatId(chatId);
+                    user.setBotState(botState);
+
+                    userService.saveUser(user);
+                    return;
             }
+
+            botState = user.getBotState();
+            botState.handleInput(user, update);
+            botState = botState.nextState();
 
             if (botState.isResponseNeeded()) {
                 botState.sendResponse(message);
             }
+
             user = userService.findUserByChatId(user.getChatId());
             user.setBotState(botState);
             userService.updateUser(user);
