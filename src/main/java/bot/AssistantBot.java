@@ -62,12 +62,12 @@ public class AssistantBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        Message message = update.getMessage();
+        Message message = update.hasMessage() ? update.getMessage() : update.getCallbackQuery().getMessage();
 
         if (message != null && message.hasText()) {
             String messageText = message.getText();
             long chatId = message.getChatId();
-            User user = userService.findUserByChatId(chatId);
+            User user = userService.findUserByChatId(message.getChatId());
 
             BotState botState;
 
@@ -76,7 +76,6 @@ public class AssistantBot extends TelegramLongPollingBot {
                     userService.deleteUser(user);
                 }
                 botState = BotState.Start;
-                botState.setResponseNeeded(true);
 
                 user = new Guest();
                 user.setChatId(chatId);
@@ -95,16 +94,7 @@ public class AssistantBot extends TelegramLongPollingBot {
             user = userService.findUserByChatId(user.getChatId());
             user.setBotState(botState);
             userService.updateUser(user);
-
-            return;
         }
-
-        if (update.hasCallbackQuery()) {
-            BotState botState = BotState.Start;
-
-            botState.handleInput(new User(), update);
-        }
-
     }
 
     @Override

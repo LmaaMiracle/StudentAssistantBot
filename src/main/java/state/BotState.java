@@ -23,64 +23,18 @@ public enum BotState {
 
         @Override
         public void handleInput(User user, Update update) {
-            AssistantBot bot = AssistantBot.getInstance();
             if (update.hasCallbackQuery()) {
-
-                String callData = update.getCallbackQuery().getData();
-                int messageId = update.getCallbackQuery().getMessage().getMessageId();
-                long chatId = update.getCallbackQuery().getMessage().getChatId();
-
-                if (callData.equals("info")) {
-                    String answer = " Я был создан тремя обычными студентами, они обо мне то и заботятся." +
-                            " Всё что есть во мне - их рук дело.\n" +
-                            " Если хотите дать свой фидбек пишшите комму-то из них в tg:" +
-                            "\n Александр Ярчук: @lmaa19\n Дмитрий Шматков: @Dima_Sh_2001\n" +
-                            " Кирилл Беляев: @arShoKaBo\n " +
-                            "Почта бота: student_ass@gmail.com\n\n" +
-                            " Немного о функционале: \n" +
-                            "-Есть кнопки с разного рода инфой. Это расписание пар/ расписание звонков/ список преподавателей твоей группы и т.д. С этим не должно быть проблем.\n" +
-                            "-Есть главная фича - это рассылка твоего расписания пар в указанное тобой время. \n" +
-                            "Для этого выбери кнопку \"Время увидомления\", после чего получишь просьбу о вводе" +
-                            " времени в формате \"HH:mm\", отправь мне удобное тебе время и я не забуду тебе напомнить " +
-                            "о твоих парах!\n\n" +
-                            "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты. И далее тебе " +
-                            "придётся пройти небольшую аутентификацию.";
-
-                    sendMessage(new ButtonsHolder().setMainMenuKeyboard(update.getCallbackQuery().getMessage()).setText("Удачи! Я с тобой :)"));
-
-                    EditMessageText editMessageText = new EditMessageText()
-                            .setChatId(chatId)
-                            .setMessageId(messageId)
-                            .setText(answer);
-
-                    next = BotState.Start;
-                    next.responseNeeded = false;
-
-                    try {
-                        bot.execute(editMessageText);
-                    } catch (TelegramApiException e) {
-                        e.printStackTrace();
-                    }
+                if (update.getCallbackQuery().getData().equals("info")) {
+                    next = BotState.Info;
+                    next.responseNeeded = true;
                 }
-
-            } else {
-                switch (update.getMessage().getText()) {
-                    case Command.STUDENT:
-                        next = BotState.StudentRegistration;
-                        next.responseNeeded = true;
-                        break;
-                    case Command.LECTURER:
-                        next = BotState.LecturerRegistration;
-                        next.responseNeeded = true;
-                        break;
-                    default:
-                        sendMessage(new SendMessage()
-                                .setChatId(user.getChatId())
-                                .setText("Такого выбора нет, попробуйте ещё раз"));
-                        next = BotState.Start;
-                        next.responseNeeded = false;
-                }
+                return;
             }
+            sendMessage(new SendMessage().
+                    setChatId(update.getMessage().getChatId()).
+                    setText("Нажмите info, pls"));
+            next = BotState.Start;
+            next.responseNeeded = false;
         }
 
         @Override
@@ -92,6 +46,61 @@ public enum BotState {
                             "Я ещё развиваюсь и поэтому жду твои пожелания и замечания!\n\n" +
                             "Оставить отзыв, просмотреть контактную информацию, а также ознакомиться с инструкцией можно выбрав кнопку ℹ️ Info.\n ")
                     .setReplyMarkup(new InlineHolder().getInlineKeyboardMarkup(message)));
+        }
+
+        @Override
+        public BotState nextState() {
+            return next;
+        }
+    },
+
+    Info {
+        private BotState next;
+
+        @Override
+        public void handleInput(User user, Update update) {
+            switch (update.getMessage().getText()) {
+                case Command.STUDENT:
+                    next = BotState.StudentRegistration;
+                    next.responseNeeded = true;
+                    break;
+                case Command.LECTURER:
+                    next = BotState.LecturerRegistration;
+                    next.responseNeeded = true;
+                    break;
+                default:
+                    sendMessage(new SendMessage()
+                            .setChatId(user.getChatId())
+                            .setText("Такого выбора нет, попробуйте ещё раз"));
+                    next = BotState.Start;
+                    next.responseNeeded = false;
+            }
+        }
+
+        @Override
+        public void sendResponse(Message message) {
+            String answer = " Я был создан тремя обычными студентами, они обо мне то и заботятся." +
+                    " Всё что есть во мне - их рук дело.\n" +
+                    " Если хотите дать свой фидбек пишшите комму-то из них в tg:" +
+                    "\n Александр Ярчук: @lmaa19\n Дмитрий Шматков: @Dima_Sh_2001\n" +
+                    " Кирилл Беляев: @arShoKaBo\n " +
+                    "Почта бота: student_ass@gmail.com\n\n" +
+                    " Немного о функционале: \n" +
+                    "-Есть кнопки с разного рода инфой. Это расписание пар/ расписание звонков/ список преподавателей твоей группы и т.д. С этим не должно быть проблем.\n" +
+                    "-Есть главная фича - это рассылка твоего расписания пар в указанное тобой время. \n" +
+                    "Для этого выбери кнопку \"Время увидомления\", после чего получишь просьбу о вводе" +
+                    " времени в формате \"HH:mm\", отправь мне удобное тебе время и я не забуду тебе напомнить " +
+                    "о твоих парах!\n\n" +
+                    "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты. И далее тебе " +
+                    "придётся пройти небольшую аутентификацию.";
+
+            sendMessage(new EditMessageText()
+                    .setChatId(message.getChatId())
+                    .setMessageId(message.getMessageId())
+                    .setText(answer));
+
+            sendMessage(new ButtonsHolder().setMainMenuKeyboard(message).setText("Удачи! Я с тобой :)"));
+
         }
 
         @Override
@@ -326,10 +335,6 @@ public enum BotState {
         return responseNeeded;
     }
 
-    public void setResponseNeeded(boolean responseNeeded) {
-        this.responseNeeded = responseNeeded;
-    }
-
     protected UserService getUserService() {
         return userService;
     }
@@ -353,6 +358,15 @@ public enum BotState {
             e.printStackTrace();
         }
     }
+
+    protected void sendMessage(EditMessageText editMessageText) {
+        try {
+            bot.execute(editMessageText);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public abstract void handleInput(User user, Update update);
 
