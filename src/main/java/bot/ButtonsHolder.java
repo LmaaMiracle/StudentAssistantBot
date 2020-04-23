@@ -1,7 +1,5 @@
 package bot;
 
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -10,39 +8,29 @@ import java.util.List;
 
 public class ButtonsHolder {
 
-    private SendMessage sendMessage;
-    private ReplyKeyboardMarkup replyKeyboardMarkup;
+    private ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
     private final List<KeyboardRow> keyboard = new ArrayList<>();
 
-    private void buttonHolder() {
-        sendMessage = new SendMessage();
-        sendMessage.enableMarkdown(true);
-        replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        sendMessage.setReplyMarkup(replyKeyboardMarkup);
-        this.setSettings();
-    }
-
-    private void setSettings() {
+    private void setSettings(boolean oneTimeKeyboard) {
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(false);
+        replyKeyboardMarkup.setOneTimeKeyboard(oneTimeKeyboard);
     }
 
-    public SendMessage setMainMenuKeyboard(Message message) {
-        buttonHolder();
+    public ReplyKeyboardMarkup setMainMenuKeyboard() {
+        setSettings(true);
 
         keyboard.add(new KeyboardRow());
         keyboard.get(0).add(new KeyboardButton(Command.LECTURER));
         keyboard.get(0).add(new KeyboardButton(Command.STUDENT));
 
         replyKeyboardMarkup.setKeyboard(keyboard);
-        sendMessage.setChatId(message.getChatId().toString());
 
-        return sendMessage;
+        return replyKeyboardMarkup;
     }
 
-    public SendMessage setStudentKeyboard(Message message) {
-        buttonHolder();
+    public ReplyKeyboardMarkup setStudentKeyboard() {
+        setSettings(false);
 
         keyboard.add(new KeyboardRow());
         keyboard.get(0).add(new KeyboardButton(Command.SEND_GROUP_SCHEDULE));
@@ -54,13 +42,12 @@ public class ButtonsHolder {
         keyboard.get(3).add(new KeyboardButton(Command.REGISTER_TIME));
 
         replyKeyboardMarkup.setKeyboard(keyboard);
-        sendMessage.setChatId(message.getChatId().toString());
 
-        return sendMessage;
+        return replyKeyboardMarkup;
     }
 
-    public SendMessage setLecturerKeyboard(Message message) {
-        buttonHolder();
+    public ReplyKeyboardMarkup setLecturerKeyboard() {
+        setSettings(false);
 
         keyboard.add(new KeyboardRow());
         keyboard.get(0).add(new KeyboardButton(Command.LECTURER_SCHEDULE));
@@ -70,9 +57,8 @@ public class ButtonsHolder {
         keyboard.get(2).add(new KeyboardButton(Command.REGISTER_TIME));
 
         replyKeyboardMarkup.setKeyboard(keyboard);
-        sendMessage.setChatId(message.getChatId().toString());
 
-        return sendMessage;
+        return replyKeyboardMarkup;
     }
 
 }

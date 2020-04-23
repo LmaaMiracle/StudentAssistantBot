@@ -45,7 +45,7 @@ public enum BotState {
                             "Я буду полезен как преподавателям, так и студентам. Моя главная задача — помочь и не сломаться \uD83D\uDC7E.\n" +
                             "Я ещё развиваюсь и поэтому жду твои пожелания и замечания!\n\n" +
                             "Оставить отзыв, просмотреть контактную информацию, а также ознакомиться с инструкцией можно выбрав кнопку ℹ️ Info.\n ")
-                    .setReplyMarkup(new InlineHolder().getInlineKeyboardMarkup(message)));
+                    .setReplyMarkup(new InlineHolder().getInlineKeyboardMarkup()));
         }
 
         @Override
@@ -99,7 +99,11 @@ public enum BotState {
                     .setMessageId(message.getMessageId())
                     .setText(answer));
 
-            sendMessage(new ButtonsHolder().setMainMenuKeyboard(message).setText("Удачи! Я с тобой :)"));
+            sendMessage(new SendMessage().
+                    setText("Удачи! Я с тобой :)").
+                    setChatId(message.getChatId()).
+                    enableMarkdown(true).
+                    setReplyMarkup(new ButtonsHolder().setMainMenuKeyboard()));
 
         }
 
@@ -158,7 +162,7 @@ public enum BotState {
                 next = BotState.Lecturer;
                 next.responseNeeded = true;
             } else {
-                next = BotState.StudentRegistration;
+                next = BotState.LecturerRegistration;
                 next.responseNeeded = false;
             }
         }
@@ -221,9 +225,11 @@ public enum BotState {
 
         @Override
         public void sendResponse(Message message) {
-            sendMessage(new ButtonsHolder().
-                    setStudentKeyboard(message).
-                    setText("Вы студент группы Ар-шо-каво. Вы можете делать это: "));
+            sendMessage(new SendMessage().
+                    setText("Вы студент группы Ар-шо-каво. Вы можете делать это: ").
+                    setChatId(message.getChatId()).
+                    enableMarkdown(true).
+                    setReplyMarkup(new ButtonsHolder().setStudentKeyboard()));
         }
 
         @Override
@@ -269,9 +275,11 @@ public enum BotState {
 
         @Override
         public void sendResponse(Message message) {
-            sendMessage(new ButtonsHolder().
-                    setLecturerKeyboard(message).
-                    setText("Вы препод. Вы можете делать это: "));
+            sendMessage(new SendMessage().
+                    setText("Вы препод. Вы можете делать это: ").
+                    setChatId(message.getChatId()).
+                    enableMarkdown(true).
+                    setReplyMarkup(new ButtonsHolder().setLecturerKeyboard()));
         }
 
         @Override
@@ -290,7 +298,7 @@ public enum BotState {
                 return;
             }
             Member member = (Member) user;
-            ;
+
             correctInput = true;
             if (correctInput) {
                 member.setScheduleTime(update.getMessage().getText());
