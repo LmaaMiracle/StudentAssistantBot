@@ -33,11 +33,11 @@ public class ButtonsHolder {
         setSettings(false);
 
         keyboard.add(new KeyboardRow());
-        keyboard.get(0).add(new KeyboardButton(Command.SEND_GROUP_SCHEDULE));
+        keyboard.get(0).add(new KeyboardButton(Command.GET_GROUP_SCHEDULE));
         keyboard.add(new KeyboardRow());
-        keyboard.get(1).add(new KeyboardButton(Command.SEND_CALL_SCHEDULE));
+        keyboard.get(1).add(new KeyboardButton(Command.GET_CALL_SCHEDULE));
         keyboard.add(new KeyboardRow());
-        keyboard.get(2).add(new KeyboardButton(Command.LECTURER_LIST));
+        keyboard.get(2).add(new KeyboardButton(Command.GET_LECTURER_LIST));
         keyboard.add(new KeyboardRow());
         keyboard.get(3).add(new KeyboardButton(Command.REGISTER_TIME));
 
@@ -50,9 +50,9 @@ public class ButtonsHolder {
         setSettings(false);
 
         keyboard.add(new KeyboardRow());
-        keyboard.get(0).add(new KeyboardButton(Command.LECTURER_SCHEDULE));
+        keyboard.get(0).add(new KeyboardButton(Command.GET_LECTURER_SCHEDULE));
         keyboard.add(new KeyboardRow());
-        keyboard.get(1).add(new KeyboardButton(Command.SEND_CALL_SCHEDULE));
+        keyboard.get(1).add(new KeyboardButton(Command.GET_CALL_SCHEDULE));
         keyboard.add(new KeyboardRow());
         keyboard.get(2).add(new KeyboardButton(Command.REGISTER_TIME));
 

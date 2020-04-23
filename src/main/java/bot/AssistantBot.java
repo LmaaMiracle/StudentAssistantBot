@@ -1,9 +1,9 @@
 package bot;
 
-import database.entity.Guest;
-import database.entity.User;
+import database.entity.*;
 import database.service.UserService;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -50,13 +50,22 @@ public class AssistantBot extends TelegramLongPollingBot {
 
 
     public void sendSchedule(User user) {
-        try {
-            execute(new SendPhoto()
-                    .setChatId(user.getChatId())
-                    .setCaption("@ONPUStudentAssistantBot")
-                    .setPhoto("https://i.imgur.com/khEWk4K.png"));
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
+        if (user instanceof Member) {
+            Member member = (Member) user;
+            SendPhoto sendPhoto = new SendPhoto()
+                    .setChatId((user.getChatId()))
+                    .setCaption("@ONPUStudentAssistantBot");
+            if (user instanceof Student) {
+                sendPhoto.setPhoto(((Student) member).getGroup().getScheduleUrl());
+            } else if (user instanceof Lecturer) {
+                sendPhoto.setPhoto("https://i.imgur.com/3sQvSQ8.png");
+            }
+
+            try {
+                execute(sendPhoto);
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
         }
     }
 

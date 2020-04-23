@@ -21,12 +21,9 @@ public class ScheduleController extends TimerTask {
 
     @Override
     public void run() {
-        List<User> userList = userService.findAllUsers();
+        List<User> memberList = userService.findAllMembers();
 
-        for (User user : userList) {
-            if (!(user instanceof Member)) {
-                continue;
-            }
+        for (User user : memberList) {
             Member member = (Member) user;
             if (LocalTime.now(kievZoneId).format(DateTimeFormatter.ofPattern("HH:mm")).equals(member.getScheduleTime())) {
                 bot.sendSchedule(user);

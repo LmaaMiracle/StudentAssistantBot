@@ -194,17 +194,13 @@ public enum BotState {
 
         @Override
         public void handleInput(User user, Update update) {
-            Student student = (Student) user;
             switch (update.getMessage().getText()) {
-                case Command.SEND_GROUP_SCHEDULE:
-                    sendMessage(new SendPhoto()
-                            .setChatId(user.getChatId())
-                            .setCaption("@ONPUStudentAssistantBot")
-                            .setPhoto(student.getGroup().getScheduleUrl()));
+                case Command.GET_GROUP_SCHEDULE:
+                    bot.sendSchedule(user);
                     next = BotState.Student;
                     next.responseNeeded = false;
                     break;
-                case Command.SEND_CALL_SCHEDULE:
+                case Command.GET_CALL_SCHEDULE:
                     sendMessage(new SendPhoto()
                             .setChatId(user.getChatId())
                             .setCaption("@ONPUStudentAssistantBot")
@@ -212,7 +208,7 @@ public enum BotState {
                     next = BotState.Student;
                     next.responseNeeded = false;
                     break;
-                case Command.LECTURER_LIST:
+                case Command.GET_LECTURER_LIST:
                     sendMessage(new SendMessage()
                             .setChatId(user.getChatId())
                             .setText(AssistantBot.lecturerNames));
@@ -253,15 +249,12 @@ public enum BotState {
         @Override
         public void handleInput(User user, Update update) {
             switch (update.getMessage().getText()) {
-                case Command.LECTURER_SCHEDULE:
-                    sendMessage(new SendPhoto()
-                            .setChatId(user.getChatId())
-                            .setCaption("@ONPUStudentAssistantBot")
-                            .setPhoto("https://i.imgur.com/3sQvSQ8.png"));
+                case Command.GET_LECTURER_SCHEDULE:
+                    bot.sendSchedule(user);
                     next = BotState.Lecturer;
                     next.responseNeeded = false;
                     break;
-                case Command.SEND_CALL_SCHEDULE:
+                case Command.GET_CALL_SCHEDULE:
                     sendMessage(new SendPhoto()
                             .setChatId(user.getChatId())
                             .setCaption("@ONPUStudentAssistantBot")
@@ -308,10 +301,15 @@ public enum BotState {
                 correctInput = true;
                 if (correctInput) {
                     member.setScheduleTime(update.getMessage().getText());
-                    next = BotState.Start;
-                    next.responseNeeded = true;
+                    getUserService().updateUser(member);
+                    next = BotState.Student;
+                    next.responseNeeded = false;
                 } else {
-                    next = BotState.Start;
+                    SendMessage message = new SendMessage();
+                    message.setChatId(update.getMessage().getChatId());
+                    message.setText("Время введено некорректно. Попробуйте снова");
+                    sendMessage(message);
+                    next = BotState.EnterTime;
                     next.responseNeeded = true;
                 }
 
@@ -331,7 +329,7 @@ public enum BotState {
         }
     };
 
-    private final AssistantBot bot = AssistantBot.getInstance();
+    protected final AssistantBot bot = AssistantBot.getInstance();
     private final UserService userService = new UserService();
     private final GroupService groupService = new GroupService();
     protected boolean responseNeeded;
