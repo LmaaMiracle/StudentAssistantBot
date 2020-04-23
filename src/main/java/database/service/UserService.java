@@ -37,24 +37,26 @@ public class UserService {
     }
 
     public void deleteUser(User user) {
-        usersDAO.delete(user);
+        User thisUserInDatabase = findUserByChatId(user.getChatId());
+        if (thisUserInDatabase != null) {
+            user.setUserId(thisUserInDatabase.getUserId());
+            usersDAO.delete(user);
+        }
     }
 
     public void updateUser(User user) {
-        User updatedUser = findUserByChatId(user.getChatId());
-        updatedUser.setBotState(user.getBotState());
-        System.out.println(updatedUser);
-        usersDAO.update(updatedUser);
+        User thisUserInDatabase = findUserByChatId(user.getChatId());
+        user.setUserId(thisUserInDatabase.getUserId());
+        if (!user.equals(thisUserInDatabase)) {
+            usersDAO.update(user);
+        }
     }
 
     public void saveOrUpdateUser(User user) {
-        System.out.println(findUserByChatId(user.getChatId()));
         if (findUserByChatId(user.getChatId()) == null) {
             saveUser(user);
-            System.out.println("save");;
         } else {
             updateUser(user);
-            System.out.println("update");
         }
     }
 

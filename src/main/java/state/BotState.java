@@ -22,17 +22,6 @@ public enum BotState {
         private BotState next;
 
         @Override
-        public void sendResponse(Message message) {
-            sendMessage(new SendMessage().setChatId(message.getChatId()).setText("\n     Добро пожаловать \uD83D\uDE42 \n" +
-                    "    Я был создан с целью помочь человечеству улучшить учебный процесс.\n" +
-                    "    Я буду полезен как преподавателям, так и студентам. Моя главная задача — помочь и не сломаться \uD83D\uDC7E." +
-                    "\n   Я ещё развиваюсь и поэтому жду твои пожелания и замечания! \n\n" +
-                    "   Оставить отзыв, просмотреть " +
-                    "контактную информацию, а также ознакомиться с инструкцией можно выбрав кнопку 'ℹ️ Info'.\n ")
-                    .setReplyMarkup(new InlineHolder().getInlineKeyboardMarkup(message)));
-        }
-
-        @Override
         public void handleInput(User user, Update update) {
             if (update.hasCallbackQuery()) {
                 if (update.getCallbackQuery().getData().equals("info")) {
@@ -49,6 +38,17 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new SendMessage().setChatId(message.getChatId()).setText(
+                    "\nДобро пожаловать \uD83D\uDE42\n" +
+                            "Я был создан с целью помочь человечеству улучшить учебный процесс.\n" +
+                            "Я буду полезен как преподавателям, так и студентам. Моя главная задача — помочь и не сломаться \uD83D\uDC7E.\n" +
+                            "Я ещё развиваюсь и поэтому жду твои пожелания и замечания!\n\n" +
+                            "Оставить отзыв, просмотреть контактную информацию, а также ознакомиться с инструкцией можно выбрав кнопку ℹ️ Info.\n ")
+                    .setReplyMarkup(new InlineHolder().getInlineKeyboardMarkup(message)));
+        }
+
+        @Override
         public BotState nextState() {
             return next;
         }
@@ -56,31 +56,6 @@ public enum BotState {
 
     Info {
         private BotState next;
-
-        @Override
-        public void sendResponse(Message message) {
-            String answer = " Я был создан тремя обычными студентами, они обо мне то и заботятся." +
-                    " Всё что есть во мне - их рук дело.\n" +
-                    " Если хотите дать свой фидбек пишшите комму-то из них в tg:" +
-                    "\n Александр Ярчук: @lmaa19\n Дмитрий Шматков: @Dima_Sh_2001\n" +
-                    " Кирилл Беляев: @arShoKaBo\n " +
-                    "Почта бота: student_ass@gmail.com\n\n" +
-                    " Немного о функционале: \n" +
-                    "-Есть кнопки с разного рода инфой. Это расписание пар/ расписание звонков/ список преподавателей твоей группы и т.д. С этим не должно быть проблем.\n" +
-                    "-Есть главная фича - это рассылка твоего расписания пар в указанное тобой время. \n" +
-                    "Для этого выбери кнопку \"Время увидомления\", после чего получишь просьбу о вводе" +
-                    " времени в формате \"HH:mm\", отправь мне удобное тебе время и я не забуду тебе напомнить " +
-                    "о твоих парах!\n\n" +
-                    "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты. И далее тебе " +
-                    "придётся пройти небольшую аутентификацию.";
-
-            sendMessage(new ButtonsHolder().setMainMenuKeyboard(message).setText("Удачи! Я с тобой :)"));
-
-            sendMessage(new EditMessageText()
-                    .setChatId(message.getChatId())
-                    .setMessageId(message.getMessageId())
-                    .setText(answer));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -101,6 +76,33 @@ public enum BotState {
                     next.responseNeeded = false;
             }
         }
+
+        @Override
+        public void sendResponse(Message message) {
+            String answer = " Я был создан тремя обычными студентами, они обо мне то и заботятся." +
+                    " Всё что есть во мне - их рук дело.\n" +
+                    " Если хотите дать свой фидбек пишшите комму-то из них в tg:" +
+                    "\n Александр Ярчук: @lmaa19\n Дмитрий Шматков: @Dima_Sh_2001\n" +
+                    " Кирилл Беляев: @arShoKaBo\n " +
+                    "Почта бота: student_ass@gmail.com\n\n" +
+                    " Немного о функционале: \n" +
+                    "-Есть кнопки с разного рода инфой. Это расписание пар/ расписание звонков/ список преподавателей твоей группы и т.д. С этим не должно быть проблем.\n" +
+                    "-Есть главная фича - это рассылка твоего расписания пар в указанное тобой время. \n" +
+                    "Для этого выбери кнопку \"Время увидомления\", после чего получишь просьбу о вводе" +
+                    " времени в формате \"HH:mm\", отправь мне удобное тебе время и я не забуду тебе напомнить " +
+                    "о твоих парах!\n\n" +
+                    "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты. И далее тебе " +
+                    "придётся пройти небольшую аутентификацию.";
+
+            sendMessage(new EditMessageText()
+                    .setChatId(message.getChatId())
+                    .setMessageId(message.getMessageId())
+                    .setText(answer));
+
+            sendMessage(new ButtonsHolder().setMainMenuKeyboard(message).setText("Удачи! Я с тобой :)"));
+
+        }
+
         @Override
         public BotState nextState() {
             return next;
@@ -109,14 +111,6 @@ public enum BotState {
 
     StudentRegistration {
         private BotState next;
-        private boolean correctInput;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new SendMessage().
-                    setChatId(message.getChatId()).
-                    setText("Введите группу"));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -139,6 +133,13 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new SendMessage().
+                    setChatId(message.getChatId()).
+                    setText("Введите группу"));
+        }
+
+        @Override
         public BotState nextState() {
             return next;
         }
@@ -148,13 +149,6 @@ public enum BotState {
 
         private BotState next;
         private boolean correctInput;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new SendMessage().
-                    setChatId(message.getChatId()).
-                    setText("Введите фамилию"));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -170,6 +164,13 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new SendMessage().
+                    setChatId(message.getChatId()).
+                    setText("Введите фамилию"));
+        }
+
+        @Override
         public BotState nextState() {
             return next;
         }
@@ -177,13 +178,6 @@ public enum BotState {
 
     Student {
         private BotState next;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new ButtonsHolder().
-                    setStudentKeyboard(message).
-                    setText("Вы студент группы Ар-шо-каво. Вы можете делать это: "));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -226,6 +220,13 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new ButtonsHolder().
+                    setStudentKeyboard(message).
+                    setText("Вы студент группы Ар-шо-каво. Вы можете делать это: "));
+        }
+
+        @Override
         public BotState nextState() {
             return next == null ? this : next;
         }
@@ -233,13 +234,6 @@ public enum BotState {
 
     Lecturer {
         private BotState next;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new ButtonsHolder().
-                    setLecturerKeyboard(message).
-                    setText("Вы препод. Вы можете делать это: "));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -274,6 +268,13 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new ButtonsHolder().
+                    setLecturerKeyboard(message).
+                    setText("Вы препод. Вы можете делать это: "));
+        }
+
+        @Override
         public BotState nextState() {
             return next;
         }
@@ -282,13 +283,6 @@ public enum BotState {
     EnterTime {
         private BotState next;
         private boolean correctInput;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new SendMessage().
-                    setChatId(message.getChatId()).
-                    setText("Введите время"));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -309,6 +303,13 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new SendMessage().
+                    setChatId(message.getChatId()).
+                    setText("Введите время"));
+        }
+
+        @Override
         public BotState nextState() {
             return next;
         }
@@ -325,10 +326,6 @@ public enum BotState {
 
     public boolean isResponseNeeded() {
         return responseNeeded;
-    }
-
-    public void setResponseNeeded(boolean responseNeeded) {
-        this.responseNeeded = responseNeeded;
     }
 
     protected UserService getUserService() {
