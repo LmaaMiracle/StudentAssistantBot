@@ -118,21 +118,30 @@ public enum BotState {
 
         @Override
         public void handleInput(User user, Update update) {
+
             UserService userService = getUserService();
             GroupService groupService = getGroupService();
+
             if (groupService.getGroupNameSet().contains(update.getMessage().getText())) {
                 next = BotState.Student;
                 next.responseNeeded = true;
 
                 userService.deleteUser(user);
                 Student student = new Student();
+
                 student.setBotState(user.getBotState());
                 student.setChatId(user.getChatId());
                 student.setGroup(groupService.findGroupByName(update.getMessage().getText()));
+
                 userService.saveUser(student);
+
             } else {
+                SendMessage message = new SendMessage();
+                message.setChatId(update.getMessage().getChatId());
+                message.setText("Группы с таким названием не существует. Попробуйте снова");
+                sendMessage(message);
                 next = BotState.StudentRegistration;
-                next.responseNeeded = false;
+                next.responseNeeded = true;
             }
         }
 
@@ -140,7 +149,7 @@ public enum BotState {
         public void sendResponse(Message message) {
             sendMessage(new SendMessage().
                     setChatId(message.getChatId()).
-                    setText("Введите группу"));
+                    setText("Введите название группы"));
         }
 
         @Override
@@ -294,19 +303,18 @@ public enum BotState {
 
         @Override
         public void handleInput(User user, Update update) {
-            if (!(user instanceof Member)) {
-                return;
-            }
-            Member member = (Member) user;
+            if (user instanceof Member) {
+                Member member = (Member) user;
+                correctInput = true;
+                if (correctInput) {
+                    member.setScheduleTime(update.getMessage().getText());
+                    next = BotState.Start;
+                    next.responseNeeded = true;
+                } else {
+                    next = BotState.Start;
+                    next.responseNeeded = true;
+                }
 
-            correctInput = true;
-            if (correctInput) {
-                member.setScheduleTime(update.getMessage().getText());
-                next = BotState.Start;
-                next.responseNeeded = true;
-            } else {
-                next = BotState.Start;
-                next.responseNeeded = true;
             }
         }
 

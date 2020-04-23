@@ -15,8 +15,8 @@
         </property>
 
         <property name="hbm2ddl.auto">update</property>
-        <!--        <property name="connection_pool_size">1</property>-->
-        <!--        <property name="show_sql">true</property>-->
+<!--        <property name="connection_pool_size">1</property>-->
+<!--        <property name="show_sql">true</property>-->
 
         <mapping class="database.entity.User"/>
         <mapping class="database.entity.Guest"/>
