@@ -81,9 +81,9 @@ public class AssistantBot extends TelegramLongPollingBot {
                 user = new Guest();
                 user.setChatId(chatId);
                 user.setBotState(botState);
+
+                userService.saveUser(user);
             } else {
-
-
                 botState = user.getBotState();
                 botState.handleInput(user, update);
                 botState = botState.nextState();
@@ -92,9 +92,9 @@ public class AssistantBot extends TelegramLongPollingBot {
             if (botState.isResponseNeeded()) {
                 botState.sendResponse(message);
             }
+            user = userService.findUserByChatId(user.getChatId());
             user.setBotState(botState);
-            System.out.println("Next state: " + botState);
-            userService.saveOrUpdateUser(user);
+            userService.updateUser(user);
 
             return;
         }
