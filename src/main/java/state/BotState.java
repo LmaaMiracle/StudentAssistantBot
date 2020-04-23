@@ -22,21 +22,9 @@ public enum BotState {
         private BotState next;
 
         @Override
-        public void sendResponse(Message message) {
-            sendMessage(new SendMessage().setChatId(message.getChatId()).setText("\n     Добро пожаловать \uD83D\uDE42 \n" +
-                    "    Я был создан с целью помочь человечеству улучшить учебный процесс.\n" +
-                    "    Я буду полезен как преподавателям, так и студентам. Моя главная задача — помочь и не сломаться \uD83D\uDC7E." +
-                    "\n   Я ещё развиваюсь и поэтому жду твои пожелания и замечания! \n\n" +
-                    "   Оставить отзыв, просмотреть " +
-                    "контактную информацию, а также ознакомиться с инструкцией можно выбрав кнопку 'ℹ️ Info'.\n ")
-                    .setReplyMarkup(new InlineHolder().getInlineKeyboardMarkup(message)));
-        }
-
-        @Override
         public void handleInput(User user, Update update) {
             AssistantBot bot = AssistantBot.getInstance();
             if (update.hasCallbackQuery()) {
-                System.out.println("asdasdsad");
 
                 String callData = update.getCallbackQuery().getData();
                 int messageId = update.getCallbackQuery().getMessage().getMessageId();
@@ -74,52 +62,37 @@ public enum BotState {
                         e.printStackTrace();
                     }
                 }
-                return;
-            }
 
-            System.out.println("got here");
-
-            System.out.println(update.getMessage().getText());
-            System.out.println(update.getMessage().getText().equals(Command.STUDENT));
-
-            switch (update.getMessage().getText()) {
-                case Command.STUDENT:
-                    next = BotState.StudentRegistration;
-                    next.responseNeeded = true;
-                    break;
-                case Command.LECTURER:
-                    next = BotState.LecturerRegistration;
-                    next.responseNeeded = true;
-                    break;
-                default:
-                    sendMessage(new SendMessage()
-                            .setChatId(user.getChatId())
-                            .setText("Такого выбора нет, попробуйте ещё раз"));
-                    next = BotState.Start;
-                    next.responseNeeded = false;
-
+            } else {
+                switch (update.getMessage().getText()) {
+                    case Command.STUDENT:
+                        next = BotState.StudentRegistration;
+                        next.responseNeeded = true;
+                        break;
+                    case Command.LECTURER:
+                        next = BotState.LecturerRegistration;
+                        next.responseNeeded = true;
+                        break;
+                    default:
+                        sendMessage(new SendMessage()
+                                .setChatId(user.getChatId())
+                                .setText("Такого выбора нет, попробуйте ещё раз"));
+                        next = BotState.Start;
+                        next.responseNeeded = false;
+                }
             }
         }
 
-        /*@Override
-        public void handleInput(User user, String text) {
-            switch (text) {
-                case Command.STUDENT:
-                    next = BotState.StudentRegistration;
-                    next.responseNeeded = true;
-                    break;
-                case Command.LECTURER:
-                    next = BotState.LecturerRegistration;
-                    next.responseNeeded = true;
-                    break;
-                default:
-                    sendMessage(new SendMessage()
-                            .setChatId(user.getChatId())
-                            .setText("Такого выбора нет, попробуйте ещё раз"));
-                    next = BotState.Start;
-                    next.responseNeeded = false;
-            }
-        }*/
+        @Override
+        public void sendResponse(Message message) {
+            sendMessage(new SendMessage().setChatId(message.getChatId()).setText(
+                    "\nДобро пожаловать \uD83D\uDE42\n" +
+                            "Я был создан с целью помочь человечеству улучшить учебный процесс.\n" +
+                            "Я буду полезен как преподавателям, так и студентам. Моя главная задача — помочь и не сломаться \uD83D\uDC7E.\n" +
+                            "Я ещё развиваюсь и поэтому жду твои пожелания и замечания!\n\n" +
+                            "Оставить отзыв, просмотреть контактную информацию, а также ознакомиться с инструкцией можно выбрав кнопку ℹ️ Info.\n ")
+                    .setReplyMarkup(new InlineHolder().getInlineKeyboardMarkup(message)));
+        }
 
         @Override
         public BotState nextState() {
@@ -129,14 +102,6 @@ public enum BotState {
 
     StudentRegistration {
         private BotState next;
-        private boolean correctInput;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new SendMessage().
-                    setChatId(message.getChatId()).
-                    setText("Введите группу"));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -159,6 +124,13 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new SendMessage().
+                    setChatId(message.getChatId()).
+                    setText("Введите группу"));
+        }
+
+        @Override
         public BotState nextState() {
             return next;
         }
@@ -168,13 +140,6 @@ public enum BotState {
 
         private BotState next;
         private boolean correctInput;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new SendMessage().
-                    setChatId(message.getChatId()).
-                    setText("Введите фамилию"));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -190,6 +155,13 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new SendMessage().
+                    setChatId(message.getChatId()).
+                    setText("Введите фамилию"));
+        }
+
+        @Override
         public BotState nextState() {
             return next;
         }
@@ -197,13 +169,6 @@ public enum BotState {
 
     Student {
         private BotState next;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new ButtonsHolder().
-                    setStudentKeyboard(message).
-                    setText("Вы студент группы Ар-шо-каво. Вы можете делать это: "));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -246,6 +211,13 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new ButtonsHolder().
+                    setStudentKeyboard(message).
+                    setText("Вы студент группы Ар-шо-каво. Вы можете делать это: "));
+        }
+
+        @Override
         public BotState nextState() {
             return next == null ? this : next;
         }
@@ -253,13 +225,6 @@ public enum BotState {
 
     Lecturer {
         private BotState next;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new ButtonsHolder().
-                    setLecturerKeyboard(message).
-                    setText("Вы препод. Вы можете делать это: "));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -294,6 +259,13 @@ public enum BotState {
         }
 
         @Override
+        public void sendResponse(Message message) {
+            sendMessage(new ButtonsHolder().
+                    setLecturerKeyboard(message).
+                    setText("Вы препод. Вы можете делать это: "));
+        }
+
+        @Override
         public BotState nextState() {
             return next;
         }
@@ -302,13 +274,6 @@ public enum BotState {
     EnterTime {
         private BotState next;
         private boolean correctInput;
-
-        @Override
-        public void sendResponse(Message message) {
-            sendMessage(new SendMessage().
-                    setChatId(message.getChatId()).
-                    setText("Введите время"));
-        }
 
         @Override
         public void handleInput(User user, Update update) {
@@ -326,6 +291,13 @@ public enum BotState {
                 next = BotState.Start;
                 next.responseNeeded = true;
             }
+        }
+
+        @Override
+        public void sendResponse(Message message) {
+            sendMessage(new SendMessage().
+                    setChatId(message.getChatId()).
+                    setText("Введите время"));
         }
 
         @Override
