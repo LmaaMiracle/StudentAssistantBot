@@ -1,5 +1,6 @@
 package bot;
 
+import database.entity.Member;
 import database.entity.User;
 import database.service.UserService;
 import java.time.LocalTime;
@@ -23,7 +24,11 @@ public class ScheduleController extends TimerTask {
         List<User> userList = userService.findAllUsers();
 
         for (User user : userList) {
-            if (LocalTime.now(kievZoneId).format(DateTimeFormatter.ofPattern("HH:mm")).equals(user.getScheduleTime())) {
+            if (!(user instanceof Member)) {
+                continue;
+            }
+            Member member = (Member) user;
+            if (LocalTime.now(kievZoneId).format(DateTimeFormatter.ofPattern("HH:mm")).equals(member.getScheduleTime())) {
                 bot.sendSchedule(user);
             }
         }

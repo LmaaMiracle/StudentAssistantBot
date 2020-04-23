@@ -12,9 +12,9 @@ public interface UsersDAO {
 
     public void delete(User user);
 
-    public User findById(long id);
+    public List<User> findAllGuests();
 
-    public List<User> findAll();
+    public List<User> findAllStudents();
 
-    public void saveOrUpdate(User user);
+    public List<User> findAllLecturers();
 }

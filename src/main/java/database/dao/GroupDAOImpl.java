@@ -1,62 +1,63 @@
 package database.dao;
 
-import database.entity.User;
+import database.entity.Group;
 import database.util.HibernateSessionFactoryUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.List;
 
-public class UsersDAOImpl implements UsersDAO {
+public class GroupDAOImpl implements GroupDAO {
 
     @Override
-    public void save(User user) {
+    public Group findByName(String groupName) {
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        Group group = session.get(Group.class, groupName);
+        session.close();
+        return group;
+    }
+
+    @Override
+    public void save(Group group) {
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        session.save(user);
+        session.save(group);
         transaction.commit();
         session.close();
     }
 
     @Override
-    public void update(User user) {
+    public void update(Group group) {
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        session.update(user);
+        session.update(group);
         transaction.commit();
         session.close();
     }
 
     @Override
-    public void delete(User user) {
+    public void delete(Group group) {
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
-        session.delete(user);
+        session.delete(group);
         transaction.commit();
         session.close();
     }
 
     @Override
-    public List<User> findAllGuests() {
+    public List<Group> findAll() {
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        List<User> guestList = session.createQuery("FROM Guest").list();
+        List<Group> groupList = session.createQuery("FROM Group").list();
         session.close();
-        return guestList;
+        return groupList;
     }
 
     @Override
-    public List<User> findAllStudents() {
-        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        List<User> studentList = session.createQuery("FROM Student").list();
-        session.close();
-        return studentList;
-    }
-
-    @Override
-    public List<User> findAllLecturers() {
-        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        List<User> lecturerList = session.createQuery("FROM Lecturer").list();
-        session.close();
-        return lecturerList;
+    public void saveOrUpdate(Group group) {
+        if (findByName(group.getGroupName()) == null) {
+            save(group);
+        } else {
+            update(group);
+        }
     }
 }
