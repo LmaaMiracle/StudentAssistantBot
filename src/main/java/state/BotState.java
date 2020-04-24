@@ -4,6 +4,7 @@ import bot.AssistantBot;
 import bot.ButtonsHolder;
 import bot.Command;
 import bot.InlineHolder;
+import database.entity.Group;
 import database.entity.Member;
 import database.entity.Student;
 import database.entity.User;
@@ -69,7 +70,7 @@ public enum BotState {
                 case Command.LECTURER:
                     sendMessage(new SendMessage()
                             .setChatId(user.getChatId())
-                            .setText("В процессе разработки. Пожалуйста, выберите студента"));
+                            .setText("В разработке \uD83D\uDEE0"));
                     //next = BotState.LecturerRegistration;
                     //next.responseNeeded = true;
                     next = BotState.Info;
@@ -86,7 +87,8 @@ public enum BotState {
 
         @Override
         public void sendResponse(Message message) {
-            String answer = "Я был создан тремя обычными студентами, они обо мне-то и заботятся. " +
+            String info = "" +
+                    "Я был создан тремя обычными студентами, они-то обо мне и заботятся. " +
                     "Всё что есть во мне — их рук дело.\n" +
                     "Если хотите дать свой фидбек пишите кому-то из них:\n" +
                     "Александр Ярчук: @lmaa19\nДмитрий Шматков: @Dima_Sh_2001\n" +
@@ -94,21 +96,22 @@ public enum BotState {
                     "Почта бота: student_ass@gmail.com\n\n" +
                     "Немного о функционале: \n" +
                     "▪️Есть кнопки с разного рода инфой. Это расписание пар/расписание звонков/список преподавателей" +
-                    "твоей группы и т.д., c этим не должно быть проблем.\n" +
+                    "твоей группы и т. д., c этим не должно быть проблем.\n" +
                     "▪️Есть главная фича — это рассылка твоего расписания пар в указанное тобой время. \n" +
                     "Для этого выбери кнопку \"Время уведомления\", после чего получишь просьбу о вводе " +
                     "времени в формате \"HH:mm\", отправь мне удобное тебе время, и я не забуду тебе напомнить " +
                     "о твоих парах!\n\n" +
                     "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты, и далее тебе " +
-                    "придётся пройти небольшую аутентификацию.";
+                    "придётся пройти небольшую аутентификацию.\n" +
+                    "Раздел преподавателя пока что находится в разработке, поэтому временно недоступен \uD83D\uDD27";
 
             sendMessage(new EditMessageText()
                     .setChatId(message.getChatId())
                     .setMessageId(message.getMessageId())
-                    .setText(answer));
+                    .setText(info));
 
             sendMessage(new SendMessage().
-                    setText("Удачи! Я с тобой :)").
+                    setText("Кто вы?").
                     setChatId(message.getChatId()).
                     enableMarkdown(true).
                     setReplyMarkup(new ButtonsHolder().setMainMenuKeyboard()));
@@ -132,18 +135,22 @@ public enum BotState {
 
             if (update.hasCallbackQuery()) {
                 if (update.getCallbackQuery().getData().equals("groups")) {
-                    String answer = groupService.getGroupNameSet().toString();
+                    StringBuilder groupList = new StringBuilder();
+                    groupList.append("Введите название одной из групп:");
+                    int i = 1;
+                    for (String groupName : groupService.getGroupNameSet()) {
+                        groupList.append("\n▪ ").append(groupName);
+                    }
+                    groupList.append("\n\n").append("Например: АИ-182");
                     sendMessage(new EditMessageText()
                             .setChatId(update.getCallbackQuery().getMessage().getChatId())
                             .setMessageId(update.getCallbackQuery().getMessage().getMessageId())
-                            .setText(answer));
+                            .setText(groupList.toString()));
                 }
                 next = BotState.StudentRegistration;
                 next.responseNeeded = false;
 
             } else if (groupService.getGroupNameSet().contains(update.getMessage().getText())) {
-                next = BotState.Student;
-                next.responseNeeded = true;
 
                 userService.deleteUser(user);
                 Student student = new Student();
@@ -153,6 +160,9 @@ public enum BotState {
                 student.setGroup(groupService.findGroupByName(update.getMessage().getText()));
 
                 userService.saveUser(student);
+
+                next = BotState.Student;
+                next.responseNeeded = true;
 
             } else {
                 sendMessage(new SendMessage().
@@ -167,7 +177,7 @@ public enum BotState {
         public void sendResponse(Message message) {
             sendMessage(new SendMessage()
                     .setChatId(message.getChatId())
-                    .setText("Введите название группы (например АИ-182)")
+                    .setText("Введите название вашей группы")
                     .setReplyMarkup(new InlineHolder().getGroupInlineKeyboard()));
         }
 
@@ -262,7 +272,7 @@ public enum BotState {
         public void sendResponse(Message message) {
             User student = getUserService().findUserByChatId(message.getChatId());
             sendMessage(new SendMessage().
-                    setText("Вы вошли как студент группы " + ((Student) student).getGroup().getGroupName()).
+                    setText("✔️ Вы вошли как студент группы " + ((Student) student).getGroup().getGroupName()).
                     setChatId(message.getChatId()).
                     enableMarkdown(true).
                     setReplyMarkup(new ButtonsHolder().setStudentKeyboard()));
