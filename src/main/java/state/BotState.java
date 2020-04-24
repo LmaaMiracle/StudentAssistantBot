@@ -67,14 +67,19 @@ public enum BotState {
                     next.responseNeeded = true;
                     break;
                 case Command.LECTURER:
-                    next = BotState.LecturerRegistration;
-                    next.responseNeeded = true;
+                    sendMessage(new SendMessage()
+                            .setChatId(user.getChatId())
+                            .setText("В процессе разработки. Пожалуйста, выберите студента"));
+                    //next = BotState.LecturerRegistration;
+                    //next.responseNeeded = true;
+                    next = BotState.Info;
+                    next.responseNeeded = false;
                     break;
                 default:
                     sendMessage(new SendMessage()
                             .setChatId(user.getChatId())
                             .setText("Такого выбора нет, попробуйте ещё раз"));
-                    next = BotState.Start;
+                    next = BotState.Info;
                     next.responseNeeded = false;
             }
         }
@@ -133,7 +138,8 @@ public enum BotState {
                             .setMessageId(update.getCallbackQuery().getMessage().getMessageId())
                             .setText(answer));
                 }
-                next.responseNeeded = true;
+                next = BotState.StudentRegistration;
+                next.responseNeeded = false;
 
             } else if (groupService.getGroupNameSet().contains(update.getMessage().getText())) {
                 next = BotState.Student;
@@ -149,12 +155,11 @@ public enum BotState {
                 userService.saveUser(student);
 
             } else {
-                SendMessage message = new SendMessage();
-                message.setChatId(update.getMessage().getChatId());
-                message.setText("Группы с таким названием не существует. Попробуйте снова");
-                sendMessage(message);
+                sendMessage(new SendMessage().
+                        setChatId(update.getMessage().getChatId()).
+                        setText("Группы с таким названием не существует. Попробуйте снова"));
                 next = BotState.StudentRegistration;
-                next.responseNeeded = true;
+                next.responseNeeded = false;
             }
         }
 
@@ -338,22 +343,22 @@ public enum BotState {
                                 .setMessageId(update.getCallbackQuery().getMessage().getMessageId())
                                 .setText(answer));
                     }
+                    next = BotState.EnterTime;
                     next.responseNeeded = false;
                 }
 
                 if (pattern.matcher(update.getMessage().getText()).matches()) {
                     member.setScheduleTime(update.getMessage().getText());
                     getUserService().updateUser(member);
-                    next = BotState.Student;
-                    next.responseNeeded = false;
                     sendMessage(new SendMessage().setChatId(update.getMessage().getChatId())
                             .setText("Отлично! Расаписание будет приходить в " + update.getMessage().getText()
                                     + ".\nПогрешность до 40 секунд."));
+                    next = BotState.Student;
+                    next.responseNeeded = false;
                 } else {
-                    SendMessage message = new SendMessage();
-                    message.setChatId(update.getMessage().getChatId());
-                    message.setText("Время введено некорректно. Попробуйте снова");
-                    sendMessage(message);
+                    sendMessage(new SendMessage().
+                            setChatId(update.getMessage().getChatId()).
+                            setText("Время введено некорректно. Попробуйте снова"));
                     next = BotState.EnterTime;
                     next.responseNeeded = false;
                 }

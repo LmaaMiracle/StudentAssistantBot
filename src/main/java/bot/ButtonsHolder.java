@@ -18,7 +18,8 @@ public class ButtonsHolder {
     }
 
     public ReplyKeyboardMarkup setMainMenuKeyboard() {
-        setSettings(true);
+        setSettings(false);
+
         keyboard.add(new KeyboardRow());
         keyboard.get(0).add(new KeyboardButton(Command.LECTURER));
         keyboard.get(0).add(new KeyboardButton(Command.STUDENT));
@@ -62,6 +63,4 @@ public class ButtonsHolder {
 
         return replyKeyboardMarkup;
     }
-
 }
-
