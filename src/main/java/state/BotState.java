@@ -4,7 +4,6 @@ import bot.AssistantBot;
 import bot.ButtonsHolder;
 import bot.Command;
 import bot.InlineHolder;
-import database.entity.Group;
 import database.entity.Member;
 import database.entity.Student;
 import database.entity.User;
@@ -47,7 +46,6 @@ public enum BotState {
                             "Я был создан с целью помочь человечеству улучшить учебный процесс.\n" +
                             "Я буду полезен как преподавателям, так и студентам. Моя главная задача — помочь и не сломаться \uD83D\uDC7E.\n" +
                             "Я ещё развиваюсь и поэтому жду твои пожелания и замечания!\n\n" +
-                            "Оставить отзыв, просмотреть контактную информацию, а также ознакомиться с инструкцией можно выбрав кнопку ℹ️ Info.\n\n" +
                             "Нажмите ℹ️ Info для дальнейшей работы")
                     .setReplyMarkup(new InlineHolder().getStartInlineKeyboard()));
         }
@@ -101,10 +99,7 @@ public enum BotState {
                     "▪️Есть главная фича — это рассылка твоего расписания пар в указанное тобой время. \n" +
                     "Для этого выбери кнопку \"Время уведомления\", после чего получишь просьбу о вводе " +
                     "времени в формате \"HH:mm\", отправь мне удобное тебе время, и я не забуду тебе напомнить " +
-                    "о твоих парах!\n\n" +
-                    "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты, и далее тебе " +
-                    "придётся пройти небольшую аутентификацию.\n" +
-                    "Раздел преподавателя пока что находится в разработке, поэтому временно недоступен \uD83D\uDD27";
+                    "о твоих парах!";
 
             sendMessage(new EditMessageText()
                     .setChatId(message.getChatId())
@@ -112,7 +107,9 @@ public enum BotState {
                     .setText(info));
 
             sendMessage(new SendMessage().
-                    setText("Кто вы?").
+                    setText("" +
+                            "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты, и далее тебе придётся пройти небольшую аутентификацию.\n" +
+                            "Раздел преподавателя пока что находится в разработке, поэтому временно недоступен \uD83D\uDD27").
                     setChatId(message.getChatId()).
                     enableMarkdown(true).
                     setReplyMarkup(new ButtonsHolder().setMainMenuKeyboard()));
@@ -138,7 +135,6 @@ public enum BotState {
                 if (update.getCallbackQuery().getData().equals("groups")) {
                     StringBuilder groupList = new StringBuilder();
                     groupList.append("Введите название одной из групп:");
-                    int i = 1;
                     for (String groupName : groupService.getGroupNameSet()) {
                         groupList.append("\n▪ ").append(groupName);
                     }
@@ -339,16 +335,15 @@ public enum BotState {
         public void handleInput(User user, Update update) {
             if (user instanceof Member) {
                 Member member = (Member) user;
-                Pattern pattern = Pattern.compile("([01]?[0-9]|2[0-3]):[0-5][0-9]");
+                Pattern pattern = Pattern.compile("([01][0-9]|2[0-3]):[0-5][0-9]");
 
                 if (update.hasCallbackQuery()) {
                     if (update.getCallbackQuery().getData().equals("time_input")) {
                         String answer = "▪️Ввод времени должен быть в формате HH:mm (24h).\n" +
                                 "▪️Несколько примеров: 08:00 / 12:25 / 00:49\n" +
-                                "▪️После ввода времени бот автоматически начнёт отправлять тебе ежедневно расписание" +
-                                " твоей группы.\n" +
+                                "▪️После ввода времени бот автоматически начнёт отправлять тебе ежедневно расписание твоей группы.\n" +
                                 "▪️Возможна погрешность во времени отправки, она обычно до 40-50 секунд, что не смертельно.\n\n" +
-                                "\tВводи время, я ведь жду! \uD83D\uDE34";
+                                "Вводи время, я ведь жду! \uD83D\uDE34";
                         sendMessage(new EditMessageText()
                                 .setChatId(update.getCallbackQuery().getMessage().getChatId())
                                 .setMessageId(update.getCallbackQuery().getMessage().getMessageId())
@@ -365,15 +360,13 @@ public enum BotState {
                             .setText("Отлично! Расаписание будет приходить в " + update.getMessage().getText()
                                     + ".\nПогрешность до 40 секунд."));
                     next = BotState.Student;
-                    next.responseNeeded = false;
                 } else {
                     sendMessage(new SendMessage().
                             setChatId(update.getMessage().getChatId()).
                             setText("Время введено некорректно. Попробуйте снова"));
                     next = BotState.EnterTime;
-                    next.responseNeeded = false;
                 }
-
+                next.responseNeeded = false;
             }
         }
 
