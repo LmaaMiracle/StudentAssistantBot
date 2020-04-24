@@ -47,7 +47,7 @@ public enum BotState {
                             "Я буду полезен как преподавателям, так и студентам. Моя главная задача — помочь и не сломаться \uD83D\uDC7E.\n" +
                             "Я ещё развиваюсь и поэтому жду твои пожелания и замечания!\n\n" +
                             "Оставить отзыв, просмотреть контактную информацию, а также ознакомиться с инструкцией можно выбрав кнопку ℹ️ Info.\n ")
-                    .setReplyMarkup(new InlineHolder().getInlineKeyboardMarkup()));
+                    .setReplyMarkup(new InlineHolder().getStartInlineKeyboard()));
         }
 
         @Override
@@ -125,7 +125,17 @@ public enum BotState {
             UserService userService = getUserService();
             GroupService groupService = getGroupService();
 
-            if (groupService.getGroupNameSet().contains(update.getMessage().getText())) {
+            if (update.hasCallbackQuery()) {
+                if (update.getCallbackQuery().getData().equals("groups")) {
+                    String answer = groupService.getGroupNameSet().toString();
+                    sendMessage(new EditMessageText()
+                            .setChatId(update.getCallbackQuery().getMessage().getChatId())
+                            .setMessageId(update.getCallbackQuery().getMessage().getMessageId())
+                            .setText(answer));
+                }
+                next.responseNeeded = true;
+
+            } else if (groupService.getGroupNameSet().contains(update.getMessage().getText())) {
                 next = BotState.Student;
                 next.responseNeeded = true;
 
@@ -150,9 +160,10 @@ public enum BotState {
 
         @Override
         public void sendResponse(Message message) {
-            sendMessage(new SendMessage().
-                    setChatId(message.getChatId()).
-                    setText("Введите название группы (например АИ-182)"));
+            sendMessage(new SendMessage()
+                    .setChatId(message.getChatId())
+                    .setText("Введите название группы (например АИ-182)")
+                    .setReplyMarkup(new InlineHolder().getGroupInlineKeyboard()));
         }
 
         @Override
@@ -313,20 +324,38 @@ public enum BotState {
             if (user instanceof Member) {
                 Member member = (Member) user;
                 Pattern pattern = Pattern.compile("([01]?[0-9]|2[0-3]):[0-5][0-9]");
+
+                if (update.hasCallbackQuery()) {
+                    if (update.getCallbackQuery().getData().equals("time_input")) {
+                        String answer = "▪️Ввод времени должен быть в формате HH:mm (24h).\n" +
+                                "▪️Несколько примеров: 08:00 / 12:25 / 00:49\n" +
+                                "▪️После ввода времени бот автоматически начнёт отправлять тебе ежидневно расаписание" +
+                                " твоей группы.\n" +
+                                "▪️Возможна погрешность во времени отправки, она обычно до 40-50 секунд, что не смертельно.\n\n" +
+                                "\tВводи время, я ведь жду! \uD83D\uDE34";
+                        sendMessage(new EditMessageText()
+                                .setChatId(update.getCallbackQuery().getMessage().getChatId())
+                                .setMessageId(update.getCallbackQuery().getMessage().getMessageId())
+                                .setText(answer));
+                    }
+                    next.responseNeeded = false;
+                }
+
                 if (pattern.matcher(update.getMessage().getText()).matches()) {
                     member.setScheduleTime(update.getMessage().getText());
                     getUserService().updateUser(member);
                     next = BotState.Student;
                     next.responseNeeded = false;
                     sendMessage(new SendMessage().setChatId(update.getMessage().getChatId())
-                            .setText("Отлично! Расаписание придёт в " + update.getMessage().getText()));
+                            .setText("Отлично! Расаписание будет приходить в " + update.getMessage().getText()
+                                    + ".\nПогрешность до 40 секунд."));
                 } else {
                     SendMessage message = new SendMessage();
                     message.setChatId(update.getMessage().getChatId());
                     message.setText("Время введено некорректно. Попробуйте снова");
                     sendMessage(message);
                     next = BotState.EnterTime;
-                    next.responseNeeded = true;
+                    next.responseNeeded = false;
                 }
 
             }
@@ -334,9 +363,10 @@ public enum BotState {
 
         @Override
         public void sendResponse(Message message) {
-            sendMessage(new SendMessage().
-                    setChatId(message.getChatId()).
-                    setText("Введите время (например 08:30)"));
+            sendMessage(new SendMessage()
+                    .setChatId(message.getChatId())
+                    .setText("Введите время (например 08:30)")
+                    .setReplyMarkup(new InlineHolder().getTimeInputInstructionInlineKeyboard()));
         }
 
         @Override

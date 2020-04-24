@@ -2,7 +2,7 @@ package bot;
 
 public class Command {
     public static final String START = "/start";
-    public static final String REGISTER_TIME = "Время уведомления \uD83D\uDD5C";
+    public static final String REGISTER_TIME = "Время уведомлений \uD83D\uDD5C";
     public static final String RESTART = "/restart";
     public static final String STUDENT = "Студент";
     public static final String LECTURER = "Преподаватель";

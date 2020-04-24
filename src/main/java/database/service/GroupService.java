@@ -7,6 +7,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class GroupService {
 
@@ -37,7 +38,7 @@ public class GroupService {
     }
 
     public Set<String> getGroupNameSet() {
-        Set<String> set = new HashSet<>();
+        Set<String> set = new TreeSet<>();
         findAllGroups().forEach(group -> set.add(group.getGroupName()));
         return set;
     }
