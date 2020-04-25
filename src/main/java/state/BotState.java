@@ -4,6 +4,7 @@ import bot.AssistantBot;
 import bot.ButtonsHolder;
 import bot.Command;
 import bot.InlineHolder;
+import database.entity.Group;
 import database.entity.Member;
 import database.entity.Student;
 import database.entity.User;
@@ -140,47 +141,66 @@ public enum BotState {
             GroupService groupService = getGroupService();
 
             if (update.hasCallbackQuery()) {
-                if (update.getCallbackQuery().getData().equals("groupList")) {
-                    StringBuilder groupList = new StringBuilder();
-                    groupList.append("*Доступные группы:*\n");
-                    for (String groupName : groupService.getGroupNameSet()) {
-                        groupList.append("\n• ").append(groupName);
-                    }
+                Message message = update.getCallbackQuery().getMessage();
 
-                    execute(new EditMessageText()
-                            .setChatId(update.getCallbackQuery().getMessage().getChatId())
-                            .setMessageId(update.getCallbackQuery().getMessage().getMessageId())
-                            .setText("Введите название вашей группы"));
+                switch (update.getCallbackQuery().getData()) {
+                    case "groupList":
 
-                    execute(new SendMessage()
-                            .enableMarkdown(true)
-                            .setChatId(update.getCallbackQuery().getMessage().getChatId())
-                            .setText(groupList.toString()));
+                        StringBuilder groupList = new StringBuilder();
+                        groupList.append("*Доступные группы:*\n");
+                        for (String groupName : groupService.getGroupNameSet()) {
+                            groupList.append("\n• ").append(groupName);
+                        }
+
+                        execute(new SendMessage()
+                                .enableMarkdown(true)
+                                .setChatId(message.getChatId())
+                                .setText(groupList.toString()));
+                        break;
+
+                    case "groupInputHelp":
+
+                        String groupInputHelp = "" +
+                                "▪️Чтобы авторизоваться, необходимо ввести название своей группы.\n" +
+                                "▪️Полный список доступных групп можно увидеть, нажав на кнопку \"Список групп\".\n" +
+                                "▪️Название группы можно вводить как с дефисом, так и без, а также без учёта регистра.\n\n" +
+                                "Например:\n" +
+                                "_АИ-182, АИ182, аи182_";
+
+                        execute(new SendMessage()
+                                .setChatId(update.getCallbackQuery().getMessage().getChatId())
+                                .setText(groupInputHelp)
+                                .enableMarkdown(true));
+                        break;
                 }
-                next = BotState.StudentRegistration;
-                next.responseNeeded = false;
-
-            } else if (groupService.getGroupNameSet().contains(update.getMessage().getText())) {
-
-                userService.deleteUser(user);
-                Student student = new Student();
-
-                student.setBotState(user.getBotState());
-                student.setChatId(user.getChatId());
-                student.setGroup(groupService.findGroupByName(update.getMessage().getText()));
-
-                userService.saveUser(student);
-
-                next = BotState.Student;
-                next.responseNeeded = true;
 
             } else {
+                String messageText = update.getMessage().getText().toLowerCase();
+                for (Group group : groupService.findAllGroups()) {
+                    String groupName = group.getGroupName().toLowerCase();
+                    if (messageText.equals(groupName) || messageText.equals(groupName.replace("-", ""))) {
+                        userService.deleteUser(user);
+                        Student student = new Student();
+
+                        student.setBotState(user.getBotState());
+                        student.setChatId(user.getChatId());
+                        student.setGroup(group);
+
+                        userService.saveUser(student);
+
+                        next = BotState.Student;
+                        next.responseNeeded = true;
+                        return;
+                    }
+                }
+
                 execute(new SendMessage().
                         setChatId(update.getMessage().getChatId()).
                         setText("Группы с таким названием не существует. Попробуйте снова"));
-                next = BotState.StudentRegistration;
-                next.responseNeeded = false;
             }
+
+            next = BotState.StudentRegistration;
+            next.responseNeeded = false;
         }
 
         @Override
@@ -188,7 +208,7 @@ public enum BotState {
             execute(new SendMessage()
                     .setChatId(message.getChatId())
                     .setText("Введите название вашей группы")
-                    .setReplyMarkup(new InlineHolder().getGroupListInlineKeyboard()));
+                    .setReplyMarkup(new InlineHolder().getStudentRegistrationInlineKeyboard()));
         }
 
         @Override

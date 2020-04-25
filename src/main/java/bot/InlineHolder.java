@@ -22,10 +22,13 @@ public class InlineHolder {
         return inlineKeyboardMarkup;
     }
 
-    public InlineKeyboardMarkup getGroupListInlineKeyboard() {
-        rowInline.add(new InlineKeyboardButton("Список групп").setCallbackData("groupList"));
-
+    public InlineKeyboardMarkup getStudentRegistrationInlineKeyboard() {
         rowsInline.add(rowInline);
+        rowsInline.add(new ArrayList<InlineKeyboardButton>());
+
+        rowInline.add(new InlineKeyboardButton("Список групп").setCallbackData("groupList"));
+        rowsInline.get(1).add(new InlineKeyboardButton("Помощь \uD83D\uDCA1").setCallbackData("groupInputHelp"));
+
         inlineKeyboardMarkup.setKeyboard(rowsInline);
         return inlineKeyboardMarkup;
     }
