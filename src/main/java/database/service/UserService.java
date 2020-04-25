@@ -37,10 +37,12 @@ public class UserService {
     }
 
     public void deleteUser(User user) {
-        User thisUserInDatabase = findUserByChatId(user.getChatId());
-        if (thisUserInDatabase != null) {
-            user.setUserId(thisUserInDatabase.getUserId());
-            usersDAO.delete(user);
+        if (user != null) {
+            User thisUserInDatabase = findUserByChatId(user.getChatId());
+            if (thisUserInDatabase != null) {
+                user.setUserId(thisUserInDatabase.getUserId());
+                usersDAO.delete(user);
+            }
         }
     }
 

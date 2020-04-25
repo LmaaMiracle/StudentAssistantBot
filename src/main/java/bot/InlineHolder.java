@@ -22,8 +22,8 @@ public class InlineHolder {
         return inlineKeyboardMarkup;
     }
 
-    public InlineKeyboardMarkup getGroupInlineKeyboard() {
-        rowInline.add(new InlineKeyboardButton("Просмотреть группы").setCallbackData("groups"));
+    public InlineKeyboardMarkup getGroupListInlineKeyboard() {
+        rowInline.add(new InlineKeyboardButton("Список групп").setCallbackData("groupList"));
 
         rowsInline.add(rowInline);
         inlineKeyboardMarkup.setKeyboard(rowsInline);
@@ -31,7 +31,7 @@ public class InlineHolder {
     }
 
     public InlineKeyboardMarkup getTimeInputInstructionInlineKeyboard() {
-        rowInline.add(new InlineKeyboardButton("\uD83D\uDD5C Инструкция").setCallbackData("time_input"));
+        rowInline.add(new InlineKeyboardButton("\uD83D\uDD5C Инструкция").setCallbackData("timeInput"));
 
         rowsInline.add(rowInline);
         inlineKeyboardMarkup.setKeyboard(rowsInline);
