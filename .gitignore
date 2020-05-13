@@ -37,3 +37,5 @@ crashlytics.properties
 crashlytics-build.properties
 
 target/
+
+hibernate.cfg_local_db.txt

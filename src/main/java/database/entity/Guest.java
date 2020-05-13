@@ -13,5 +13,4 @@ import javax.persistence.Table;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public class Guest extends User {
-
 }

@@ -1,5 +1,7 @@
 package database.dao;
 
+import database.entity.Lecturer;
+import database.entity.LecturerData;
 import database.entity.User;
 import database.util.HibernateSessionFactoryUtil;
 import org.hibernate.Session;
@@ -53,10 +55,18 @@ public class UsersDAOImpl implements UsersDAO {
     }
 
     @Override
-    public List<User> findAllLecturers() {
+    public List<Lecturer> findAllLecturers() {
         Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
-        List<User> lecturerList = session.createQuery("FROM Lecturer").list();
+        List<Lecturer> lecturerList = session.createQuery("FROM Lecturer").list();
         session.close();
         return lecturerList;
+    }
+
+    @Override
+    public List<LecturerData> findAllLecturerData() {
+        Session session = HibernateSessionFactoryUtil.getSessionFactory().openSession();
+        List<LecturerData> lecturerDataList = session.createQuery("FROM LecturerData").list();
+        session.close();
+        return lecturerDataList;
     }
 }

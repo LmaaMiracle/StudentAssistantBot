@@ -1,6 +1,8 @@
 package database.service;
 
 import database.dao.UsersDAOImpl;
+import database.entity.Lecturer;
+import database.entity.LecturerData;
 import database.entity.User;
 
 import java.util.ArrayList;
@@ -70,7 +72,7 @@ public class UserService {
         return usersDAO.findAllStudents();
     }
 
-    public List<User> findAllLecturers() {
+    public List<Lecturer> findAllLecturers() {
         return usersDAO.findAllLecturers();
     }
 
@@ -87,5 +89,14 @@ public class UserService {
         userList.addAll(findAllStudents());
         userList.addAll(findAllLecturers());
         return userList;
+    }
+
+    public LecturerData findLecturerDataByLogin(String login) {
+        for (LecturerData lecturerData : usersDAO.findAllLecturerData()) {
+            if (login.equals(lecturerData.getLogin())) {
+                return lecturerData;
+            }
+        }
+        return null;
     }
 }

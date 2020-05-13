@@ -4,10 +4,7 @@ import bot.AssistantBot;
 import bot.ButtonsHolder;
 import bot.Command;
 import bot.InlineHolder;
-import database.entity.Group;
-import database.entity.Member;
-import database.entity.Student;
-import database.entity.User;
+import database.entity.*;
 import database.service.GroupService;
 import database.service.UserService;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -19,6 +16,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.Serializable;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public enum BotState {
@@ -70,13 +69,8 @@ public enum BotState {
                     next.responseNeeded = true;
                     break;
                 case Command.LECTURER:
-                    execute(new SendMessage()
-                            .setChatId(user.getChatId())
-                            .setText("В разработке \uD83D\uDEE0"));
-                    //next = BotState.LecturerRegistration;
-                    //next.responseNeeded = true;
-                    next = BotState.Info;
-                    next.responseNeeded = false;
+                    next = BotState.LecturerEnterLogin;
+                    next.responseNeeded = true;
                     break;
                 default:
                     execute(new SendMessage()
@@ -217,21 +211,106 @@ public enum BotState {
         }
     },
 
-    LecturerRegistration {
+    LecturerEnterLogin {
 
         private BotState next;
-        private boolean correctInput;
 
         @Override
         public void handleInput(User user, Update update) {
-            // Сюда записывать фамилию и тут его заносить в бд
-            correctInput = true;
-            if (correctInput) {
-                next = BotState.Lecturer;
+            UserService userService = getUserService();
+            Optional<Lecturer> optionalLecturer = userService.findAllLecturers().stream()
+                    .filter((lecturer) -> update.getMessage().getText().equals(lecturer.getLecturerData().getLogin()))
+                    .findAny();
+
+            if (optionalLecturer.isPresent()) {
+                if (optionalLecturer.get().getIsLoggedIn()) {
+                    next = BotState.Lecturer;
+                } else {
+                    next = BotState.LecturerEnterPassword;
+                }
+            } else if (userService.findLecturerDataByLogin(update.getMessage().getText()) != null) {
+                userService.deleteUser(user);
+                Lecturer lecturer = new Lecturer();
+                lecturer.setChatId(user.getChatId());
+                lecturer.setBotState(user.getBotState());
+                lecturer.setLecturerData(userService.findLecturerDataByLogin(update.getMessage().getText()));
+                lecturer.setIsLoggedIn(false);
+                userService.saveUser(lecturer);
+
+                LecturerData lecturerData = lecturer.getLecturerData();
+                execute(new SendMessage()
+                        .setChatId(user.getChatId())
+                        .setText("Пользователь: " +
+                                lecturerData.getSecondName() + " " +
+                                lecturerData.getFirstName().charAt(0) + ". " +
+                                lecturerData.getMiddleName().charAt(0) + "."));
+                next = BotState.LecturerEnterPassword;
+            } else {
+                execute(new SendMessage()
+                        .setChatId(user.getChatId())
+                        .setText("❗ Неправильный логин"));
+                next = BotState.LecturerEnterLogin;
+                try {
+                    Thread.sleep(625);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            next.responseNeeded = true;
+        }
+
+        @Override
+        public void sendResponse(Message message) {
+            execute(new SendMessage().
+                    setChatId(message.getChatId()).
+                    setText("Введите логин ↩"));
+//            todo: реализовать инлайн с информацией про процесс авторизации
+        }
+
+        @Override
+        public BotState nextState() {
+            return next;
+        }
+    },
+
+    LecturerEnterPassword {
+
+        private BotState next;
+
+        @Override
+        public void handleInput(User user, Update update) {
+            UserService userService = getUserService();
+            Optional<Lecturer> optionalLecturer = userService.findAllLecturers().stream()
+                    .filter((lecturer -> user.getChatId() == lecturer.getChatId()))
+                    .findAny();
+            if (optionalLecturer.isPresent()) {
+                String messageText = update.getMessage().getText();
+                Lecturer lecturer = optionalLecturer.get();
+                if (messageText.equals(lecturer.getLecturerData().getPassword())) {
+                    lecturer.setIsLoggedIn(true);
+                    userService.updateUser(lecturer);
+                    LecturerData lecturerData = lecturer.getLecturerData();
+                    execute(new SendMessage()
+                            .setChatId(user.getChatId())
+                            .setText("Вы вошли как " +
+                                    lecturerData.getSecondName() + " " +
+                                    lecturerData.getFirstName() + " " +
+                                    lecturerData.getMiddleName()));
+                    next = BotState.Lecturer;
+                } else {
+                    execute(new SendMessage()
+                            .setChatId(user.getChatId())
+                            .setText("Неверный пароль пользователя"));
+                    next = BotState.LecturerEnterPassword;
+                    try {
+                        Thread.sleep(625);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 next.responseNeeded = true;
             } else {
-                next = BotState.LecturerRegistration;
-                next.responseNeeded = false;
+                throw new NoSuchElementException();
             }
         }
 
@@ -239,7 +318,7 @@ public enum BotState {
         public void sendResponse(Message message) {
             execute(new SendMessage().
                     setChatId(message.getChatId()).
-                    setText("Введите фамилию"));
+                    setText("Введите пароль ↩"));
         }
 
         @Override
@@ -454,22 +533,6 @@ public enum BotState {
             e.printStackTrace();
         }
     }
-
-    /*protected void execute(SendPhoto sendPhoto) {
-        try {
-            bot.execute(sendPhoto);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void execute(EditMessageText editMessageText) {
-        try {
-            bot.execute(editMessageText);
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-    }*/
 
 
     public abstract void handleInput(User user, Update update);

@@ -26,5 +26,5 @@ public class Group {
     private List<Student> studentList;
 
     @ManyToMany(mappedBy = "groupList")
-    private List<Lecturer> lecturerList;
+    private List<LecturerData> lecturerList;
 }

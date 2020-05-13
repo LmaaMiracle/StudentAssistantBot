@@ -16,6 +16,5 @@ public class Student extends Member {
 
     @ManyToOne
     @JoinColumn(name = "group_name")
-    @JsonIgnore
     private Group group;
 }

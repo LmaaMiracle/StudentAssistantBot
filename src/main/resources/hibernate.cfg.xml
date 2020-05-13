@@ -20,9 +20,11 @@
 
         <mapping class="database.entity.User"/>
         <mapping class="database.entity.Guest"/>
+        <mapping class="database.entity.Member"/>
         <mapping class="database.entity.Student"/>
         <mapping class="database.entity.Lecturer"/>
         <mapping class="database.entity.Group"/>
+        <mapping class="database.entity.LecturerData"/>
 
     </session-factory>
 </hibernate-configuration>

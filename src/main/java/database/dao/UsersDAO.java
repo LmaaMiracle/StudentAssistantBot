@@ -1,5 +1,7 @@
 package database.dao;
 
+import database.entity.Lecturer;
+import database.entity.LecturerData;
 import database.entity.User;
 
 import java.util.List;
@@ -16,5 +18,7 @@ public interface UsersDAO {
 
     public List<User> findAllStudents();
 
-    public List<User> findAllLecturers();
+    public List<Lecturer> findAllLecturers();
+
+    public List<LecturerData> findAllLecturerData();
 }
