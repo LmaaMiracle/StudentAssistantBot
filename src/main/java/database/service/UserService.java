@@ -99,4 +99,8 @@ public class UserService {
         }
         return null;
     }
+
+    public List<LecturerData> findAllLecturerData() {
+        return usersDAO.findAllLecturerData();
+    }
 }

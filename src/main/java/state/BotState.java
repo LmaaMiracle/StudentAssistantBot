@@ -218,33 +218,48 @@ public enum BotState {
         @Override
         public void handleInput(User user, Update update) {
             UserService userService = getUserService();
-            Optional<Lecturer> optionalLecturer = userService.findAllLecturers().stream()
-                    .filter((lecturer) -> update.getMessage().getText().equals(lecturer.getLecturerData().getLogin()))
+            Optional<LecturerData> optionalLecturerData = userService.findAllLecturerData().stream()
+                    .filter(lecturerData -> update.getMessage().getText().equals(lecturerData.getLogin()))
                     .findAny();
 
-            if (optionalLecturer.isPresent()) {
-                if (optionalLecturer.get().getIsLoggedIn()) {
-                    next = BotState.Lecturer;
+            if (optionalLecturerData.isPresent()) {
+                Optional<Lecturer> optionalLecturer = userService.findAllLecturers().stream()
+                        .filter(lecturer -> update.getMessage().getText().equals(lecturer.getLecturerData().getLogin()))
+                        .findAny();
+                if (optionalLecturer.isPresent()) {
+                    Lecturer lecturer = optionalLecturer.get();
+                    if (lecturer.getChatId() == user.getChatId()) {
+                        if (lecturer.getIsLoggedIn()) {
+                            next = BotState.Lecturer;
+                        }
+                        else {
+                            next = BotState.LecturerEnterPassword;
+                        }
+                    } else if (!lecturer.getIsLoggedIn()) {
+                        userService.deleteUser(user);
+                        lecturer = new Lecturer();
+                        lecturer.setChatId(user.getChatId());
+                        lecturer.setBotState(user.getBotState());
+                        lecturer.setLecturerData(userService.findLecturerDataByLogin(update.getMessage().getText()));
+                        lecturer.setIsLoggedIn(false);
+                        userService.saveUser(lecturer);
+                        next = BotState.LecturerEnterPassword;
+                    } else {
+                        execute(new SendMessage()
+                                .setChatId(user.getChatId())
+                                .setText("❗ В данный аккаунт уже выполнен вход"));
+                        next = BotState.Info;
+                    }
                 } else {
+                    userService.deleteUser(user);
+                    Lecturer lecturer = new Lecturer();
+                    lecturer.setChatId(user.getChatId());
+                    lecturer.setBotState(user.getBotState());
+                    lecturer.setLecturerData(userService.findLecturerDataByLogin(update.getMessage().getText()));
+                    lecturer.setIsLoggedIn(false);
+                    userService.saveUser(lecturer);
                     next = BotState.LecturerEnterPassword;
                 }
-            } else if (userService.findLecturerDataByLogin(update.getMessage().getText()) != null) {
-                userService.deleteUser(user);
-                Lecturer lecturer = new Lecturer();
-                lecturer.setChatId(user.getChatId());
-                lecturer.setBotState(user.getBotState());
-                lecturer.setLecturerData(userService.findLecturerDataByLogin(update.getMessage().getText()));
-                lecturer.setIsLoggedIn(false);
-                userService.saveUser(lecturer);
-
-                LecturerData lecturerData = lecturer.getLecturerData();
-                execute(new SendMessage()
-                        .setChatId(user.getChatId())
-                        .setText("Пользователь: " +
-                                lecturerData.getSecondName() + " " +
-                                lecturerData.getFirstName().charAt(0) + ". " +
-                                lecturerData.getMiddleName().charAt(0) + "."));
-                next = BotState.LecturerEnterPassword;
             } else {
                 execute(new SendMessage()
                         .setChatId(user.getChatId())
@@ -280,38 +295,30 @@ public enum BotState {
         @Override
         public void handleInput(User user, Update update) {
             UserService userService = getUserService();
-            Optional<Lecturer> optionalLecturer = userService.findAllLecturers().stream()
-                    .filter((lecturer -> user.getChatId() == lecturer.getChatId()))
-                    .findAny();
-            if (optionalLecturer.isPresent()) {
-                String messageText = update.getMessage().getText();
-                Lecturer lecturer = optionalLecturer.get();
-                if (messageText.equals(lecturer.getLecturerData().getPassword())) {
-                    lecturer.setIsLoggedIn(true);
-                    userService.updateUser(lecturer);
-                    LecturerData lecturerData = lecturer.getLecturerData();
-                    execute(new SendMessage()
-                            .setChatId(user.getChatId())
-                            .setText("Вы вошли как " +
-                                    lecturerData.getSecondName() + " " +
-                                    lecturerData.getFirstName() + " " +
-                                    lecturerData.getMiddleName()));
-                    next = BotState.Lecturer;
-                } else {
-                    execute(new SendMessage()
-                            .setChatId(user.getChatId())
-                            .setText("Неверный пароль пользователя"));
-                    next = BotState.LecturerEnterPassword;
-                    try {
-                        Thread.sleep(625);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                next.responseNeeded = true;
+            Lecturer lecturer = (Lecturer) user;
+            if (update.getMessage().getText().equals(lecturer.getLecturerData().getPassword())) {
+                lecturer.setIsLoggedIn(true);
+                userService.updateUser(lecturer);
+                LecturerData lecturerData = lecturer.getLecturerData();
+                execute(new SendMessage()
+                        .setChatId(user.getChatId())
+                        .setText("Вы вошли как " +
+                                lecturerData.getSecondName() + " " +
+                                lecturerData.getFirstName() + " " +
+                                lecturerData.getMiddleName()));
+                next = BotState.Lecturer;
             } else {
-                throw new NoSuchElementException();
+                execute(new SendMessage()
+                        .setChatId(user.getChatId())
+                        .setText("❗ Неверный пароль пользователя"));
+                next = BotState.LecturerEnterPassword;
+                try {
+                    Thread.sleep(625);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+            next.responseNeeded = true;
         }
 
         @Override
