@@ -3,7 +3,6 @@ package database.entity;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.checkerframework.common.aliasing.qual.Unique;
 
 import javax.persistence.*;
 import java.util.List;
@@ -30,13 +29,6 @@ public class LecturerData {
 
     @Column(name = "email")
     private String email;
-
-    @Column(name = "login")
-    @Unique
-    private String login;
-
-    @Column(name = "password")
-    private String password;
 
     @OneToMany(mappedBy = "lecturerData", cascade = CascadeType.ALL)
     private List<Lecturer> lecturerList;

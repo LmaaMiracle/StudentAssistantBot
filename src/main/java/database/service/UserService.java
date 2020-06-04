@@ -91,9 +91,9 @@ public class UserService {
         return userList;
     }
 
-    public LecturerData findLecturerDataByLogin(String login) {
+    public LecturerData findLecturerDataBySecondName(String login) {
         for (LecturerData lecturerData : usersDAO.findAllLecturerData()) {
-            if (login.equals(lecturerData.getLogin())) {
+            if (login.equals(lecturerData.getSecondName())) {
                 return lecturerData;
             }
         }

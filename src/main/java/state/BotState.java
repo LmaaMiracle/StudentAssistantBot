@@ -217,115 +217,35 @@ public enum BotState {
 
         @Override
         public void handleInput(User user, Update update) {
+
             UserService userService = getUserService();
             Optional<LecturerData> optionalLecturerData = userService.findAllLecturerData().stream()
-                    .filter(lecturerData -> update.getMessage().getText().equals(lecturerData.getLogin()))
+                    .filter(lecturerData -> update.getMessage().getText().equals(lecturerData.getSecondName()))
                     .findAny();
-
             if (optionalLecturerData.isPresent()) {
-                Optional<Lecturer> optionalLecturer = userService.findAllLecturers().stream()
-                        .filter(lecturer -> update.getMessage().getText().equals(lecturer.getLecturerData().getLogin()))
-                        .findAny();
-                if (optionalLecturer.isPresent()) {
-                    Lecturer lecturer = optionalLecturer.get();
-                    if (lecturer.getChatId() == user.getChatId()) {
-                        if (lecturer.getIsLoggedIn()) {
-                            next = BotState.Lecturer;
-                        }
-                        else {
-                            next = BotState.LecturerEnterPassword;
-                        }
-                    } else if (!lecturer.getIsLoggedIn()) {
-                        userService.deleteUser(user);
-                        lecturer = new Lecturer();
-                        lecturer.setChatId(user.getChatId());
-                        lecturer.setBotState(user.getBotState());
-                        lecturer.setLecturerData(userService.findLecturerDataByLogin(update.getMessage().getText()));
-                        lecturer.setIsLoggedIn(false);
-                        userService.saveUser(lecturer);
-                        next = BotState.LecturerEnterPassword;
-                    } else {
-                        execute(new SendMessage()
-                                .setChatId(user.getChatId())
-                                .setText("❗ В данный аккаунт уже выполнен вход"));
-                        next = BotState.Info;
-                    }
-                } else {
-                    userService.deleteUser(user);
-                    Lecturer lecturer = new Lecturer();
-                    lecturer.setChatId(user.getChatId());
-                    lecturer.setBotState(user.getBotState());
-                    lecturer.setLecturerData(userService.findLecturerDataByLogin(update.getMessage().getText()));
-                    lecturer.setIsLoggedIn(false);
-                    userService.saveUser(lecturer);
-                    next = BotState.LecturerEnterPassword;
-                }
+                userService.deleteUser(user);
+
+                Lecturer lecturer = new Lecturer();
+                lecturer.setChatId(user.getChatId());
+                lecturer.setBotState(user.getBotState());
+                lecturer.setLecturerData(userService.findLecturerDataBySecondName(update.getMessage().getText()));
+
+                userService.saveUser(lecturer);next = BotState.Lecturer;
+                next.responseNeeded = true;
             } else {
                 execute(new SendMessage()
                         .setChatId(user.getChatId())
-                        .setText("❗ Неправильный логин"));
+                        .setText("Неправильная фамилия"));
                 next = BotState.LecturerEnterLogin;
-                try {
-                    Thread.sleep(625);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                next.responseNeeded = false;
             }
-            next.responseNeeded = true;
         }
 
         @Override
         public void sendResponse(Message message) {
             execute(new SendMessage().
                     setChatId(message.getChatId()).
-                    setText("Введите логин ↩"));
-//            todo: реализовать инлайн с информацией про процесс авторизации
-        }
-
-        @Override
-        public BotState nextState() {
-            return next;
-        }
-    },
-
-    LecturerEnterPassword {
-
-        private BotState next;
-
-        @Override
-        public void handleInput(User user, Update update) {
-            UserService userService = getUserService();
-            Lecturer lecturer = (Lecturer) user;
-            if (update.getMessage().getText().equals(lecturer.getLecturerData().getPassword())) {
-                lecturer.setIsLoggedIn(true);
-                userService.updateUser(lecturer);
-                LecturerData lecturerData = lecturer.getLecturerData();
-                execute(new SendMessage()
-                        .setChatId(user.getChatId())
-                        .setText("Вы вошли как " +
-                                lecturerData.getSecondName() + " " +
-                                lecturerData.getFirstName() + " " +
-                                lecturerData.getMiddleName()));
-                next = BotState.Lecturer;
-            } else {
-                execute(new SendMessage()
-                        .setChatId(user.getChatId())
-                        .setText("❗ Неверный пароль пользователя"));
-                next = BotState.LecturerEnterPassword;
-                try {
-                    Thread.sleep(625);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            next.responseNeeded = true;
-        }
-
-        @Override
-        public void sendResponse(Message message) {
-            execute(new SendMessage().
-                    setChatId(message.getChatId()).
-                    setText("Введите пароль ↩"));
+                    setText("Введите Вашу Фамилию:"));
         }
 
         @Override
@@ -435,7 +355,7 @@ public enum BotState {
         @Override
         public void sendResponse(Message message) {
             execute(new SendMessage().
-                    setText("Вы препод. Вы можете делать это: ").
+                    setText("Вы вошли как преподователь.").
                     setChatId(message.getChatId()).
                     enableMarkdown(true).
                     setReplyMarkup(new ButtonsHolder().setLecturerKeyboard()));
@@ -479,7 +399,11 @@ public enum BotState {
                     execute(new SendMessage().setChatId(update.getMessage().getChatId())
                             .setText("Отлично! Расаписание будет приходить в " + update.getMessage().getText()
                                     + " в течение минуты"));
-                    next = BotState.Student;
+                    if (member instanceof Student) {
+                        next = BotState.Student;
+                    } else if (member instanceof Lecturer) {
+                        next = BotState.Lecturer;
+                    }
                 } else {
                     execute(new SendMessage().
                             setChatId(update.getMessage().getChatId()).
