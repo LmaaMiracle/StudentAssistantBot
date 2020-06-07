@@ -6,12 +6,12 @@
     <session-factory>
         <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
         <property name="hibernate.connection.url">
-            jdbc:postgresql://ec2-176-34-97-213.eu-west-1.compute.amazonaws.com:5432/d1htngarsh95ut
+            jdbc:postgresql://ec2-46-137-100-204.eu-west-1.compute.amazonaws.com:5432/d3g13j6j8i2ub1
         </property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>
-        <property name="hibernate.connection.username">qiyzrgvdgacdyz</property>
+        <property name="hibernate.connection.username">bdklzwybxtwozt</property>
         <property name="hibernate.connection.password">
-            b49fbff7cb2f0f538309f467192baff7792b89a4997533e3d217e467b206ef2e
+            401ab8a01c9e1fe3e9cb97a7bad46d896f6468af806a4d03e1fc559e7c031cd1
         </property>
 
         <property name="hbm2ddl.auto">update</property>
