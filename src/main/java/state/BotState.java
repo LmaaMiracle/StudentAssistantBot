@@ -4,7 +4,6 @@ import bot.AssistantBot;
 import bot.ButtonsHolder;
 import bot.Command;
 import bot.InlineHolder;
-import com.google.inject.internal.cglib.core.$KeyFactory;
 import database.entity.*;
 import database.service.GroupService;
 import database.service.UserService;
@@ -14,10 +13,10 @@ import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.Serializable;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -111,12 +110,10 @@ public enum BotState {
             }
 
             execute(new SendMessage().
-                    setText("" +
-                            "Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты, и далее тебе придётся пройти небольшую аутентификацию.\n").
-//                            "Раздел преподавателя пока что находится в разработке, поэтому временно недоступен ⏳").
-        setChatId(message.getChatId()).
-                            enableMarkdown(true).
-                            setReplyMarkup(new ButtonsHolder().setMainMenuKeyboard()));
+                    setText("Чтобы начать работу с ботом выбери на клавиатуре с кнопками ниже кто ты, и далее тебе придётся пройти небольшую аутентификацию.").
+                    setChatId(message.getChatId()).
+                    enableMarkdown(true).
+                    setReplyMarkup(new ButtonsHolder().setMainMenuKeyboard()));
 
         }
 
@@ -218,176 +215,27 @@ public enum BotState {
 
         @Override
         public void handleInput(User user, Update update) {
+
             UserService userService = getUserService();
+            Optional<LecturerData> optionalLecturerData = userService.findAllLecturerData().stream()
+                    .filter(lecturerData -> update.getMessage().getText().equals(lecturerData.getSecondName()))
+                    .findAny();
+            if (optionalLecturerData.isPresent()) {
+                userService.deleteUser(user);
 
-            if (update.hasCallbackQuery()) {
-                Message message = update.getCallbackQuery().getMessage();
+                Lecturer lecturer = new Lecturer();
+                lecturer.setChatId(user.getChatId());
+                lecturer.setBotState(user.getBotState());
+                lecturer.setLecturerData(userService.findLecturerDataBySecondName(update.getMessage().getText()));
 
-                switch (update.getCallbackQuery().getData()) {
-                    case "login_info":
-
-                        String loginHelp = "Для получения логина и пароля для Вашего аккаунта обратитесь в деканат вашего института.\n" +
-                                "Или напишите одному из разработчиков: \n" +
-                                "Александр: @lmaa19\n" +
-                                "Дмитрий: @Dima_Sh_2001\n" +
-                                "Кирилл: @arShoKaBo\n\n" +
-                                "Как только получите Ваш логин, введите его ниже, после чего я попрошу Вас ввести пароль.";
-
-                        execute(new EditMessageText()
-                                .setText(loginHelp)
-                                .setChatId(message.getChatId())
-                                .setMessageId(message.getMessageId())
-                                .enableMarkdown(true));
-                        next = BotState.LecturerEnterLogin;
-                        break;
-
-
-                    case "forgotten_login":
-
-                        String forgottenLoginHelp = "Если Вы забыли Ваш логин, можете: \n" +
-                                "▪️Обратиться в деканат и запросить логин для Вашего аккаунта.\n" +
-                                "▪️Написать одному из разработчиков: \n" +
-                                "Александр: @lmaa19\n" +
-                                "Дмитрий: @Dima_Sh_2001\n" +
-                                "Кирилл: @arShoKaBo\n\n" +
-                                "Как только получите Ваш логин вводите его ниже: ";
-
-
-                        execute(new EditMessageText()
-                                .setText(forgottenLoginHelp)
-                                .setChatId(message.getChatId())
-                                .setMessageId(message.getMessageId())
-                                .enableMarkdown(true));
-                        next = BotState.LecturerEnterLogin;
-
-                        break;
-
-                }
-            } else {
-                Optional<LecturerData> optionalLecturerData = userService.findAllLecturerData().stream()
-                        .filter(lecturerData -> update.getMessage().getText().equals(lecturerData.getLogin()))
-                        .findAny();
-
-                if (optionalLecturerData.isPresent()) {
-                    Optional<Lecturer> optionalLecturer = userService.findAllLecturers().stream()
-                            .filter(lecturer -> update.getMessage().getText().equals(lecturer.getLecturerData().getLogin()))
-                            .findAny();
-                    if (optionalLecturer.isPresent()) {
-                        Lecturer lecturer = optionalLecturer.get();
-                        if (lecturer.getChatId() == user.getChatId()) {
-                            if (lecturer.getIsLoggedIn()) {
-                                next = BotState.Lecturer;
-                            } else {
-                                next = BotState.LecturerEnterPassword;
-                            }
-                        } else if (!lecturer.getIsLoggedIn()) {
-                            userService.deleteUser(user);
-                            lecturer = new Lecturer();
-                            lecturer.setChatId(user.getChatId());
-                            lecturer.setBotState(user.getBotState());
-                            lecturer.setLecturerData(userService.findLecturerDataByLogin(update.getMessage().getText()));
-                            lecturer.setIsLoggedIn(false);
-                            userService.saveUser(lecturer);
-                            next = BotState.LecturerEnterPassword;
-                        } else {
-                            execute(new SendMessage()
-                                    .setChatId(user.getChatId())
-                                    .setText("❗ В данный аккаунт уже выполнен вход"));
-                            next = BotState.Info;
-                        }
-                    } else {
-                        userService.deleteUser(user);
-                        Lecturer lecturer = new Lecturer();
-                        lecturer.setChatId(user.getChatId());
-                        lecturer.setBotState(user.getBotState());
-                        lecturer.setLecturerData(userService.findLecturerDataByLogin(update.getMessage().getText()));
-                        lecturer.setIsLoggedIn(false);
-                        userService.saveUser(lecturer);
-                        next = BotState.LecturerEnterPassword;
-                    }
-                } else {
-                    execute(new SendMessage()
-                            .setChatId(user.getChatId())
-                            .setText("❗ Неправильный логин"));
-                    next = BotState.LecturerEnterLogin;
-                    try {
-                        Thread.sleep(625);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                userService.saveUser(lecturer);next = BotState.Lecturer;
                 next.responseNeeded = true;
-            }
-        }
-
-        @Override
-        public void sendResponse(Message message) {
-            execute(new SendMessage()
-                    .setChatId(message.getChatId())
-                    .setText("Введите логин ↩")
-                    .setReplyMarkup(new InlineHolder().getLecturerLoginInlineKeyboard()));
-        }
-
-        @Override
-        public BotState nextState() {
-            return next;
-        }
-    },
-
-    LecturerEnterPassword {
-
-        private BotState next;
-
-        @Override
-        public void handleInput(User user, Update update) {
-            if (update.hasCallbackQuery()) {
-                switch (update.getCallbackQuery().getData()) {
-                    case "forgotten_pass":
-                        String forgottenPasswordHelp = "Если вы забыли пароль или уверены, что он был украден, напишите одному из разработчиков:\n" +
-                                "Александр: @lmaa19\n" +
-                                "Дмитрий: @Dima_Sh_2001\n" +
-                                "Кирилл: @arShoKaBo\n\n" +
-                                "Как только Вы восстановите свой пароль введите его ниже, я жду!";
-
-
-                        execute(new EditMessageText()
-                                .setMessageId(update.getCallbackQuery().getMessage().getMessageId())
-                                .setChatId(update.getCallbackQuery().getMessage().getChatId())
-                                .setText(forgottenPasswordHelp)
-                                .enableMarkdown(true));
-
-                        next = BotState.LecturerEnterPassword;
-
-                        break;
-                }
-
             } else {
-
-                UserService userService = getUserService();
-                Lecturer lecturer = (Lecturer) user;
-                if (update.getMessage().getText().equals(lecturer.getLecturerData().getPassword())) {
-                    lecturer.setIsLoggedIn(true);
-                    userService.updateUser(lecturer);
-                    LecturerData lecturerData = lecturer.getLecturerData();
-                    execute(new SendMessage()
-                            .setChatId(user.getChatId())
-                            .setText("Вы вошли как " +
-                                    lecturerData.getSecondName() + " " +
-                                    lecturerData.getFirstName() + " " +
-                                    lecturerData.getMiddleName()));
-                    next = BotState.Lecturer;
-                } else {
-                    execute(new SendMessage()
-                            .setChatId(user.getChatId())
-                            .setText("❗ Неверный пароль пользователя"));
-                    next = BotState.LecturerEnterPassword;
-                    try {
-                        Thread.sleep(625);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                next.responseNeeded = true;
+                execute(new SendMessage()
+                        .setChatId(user.getChatId())
+                        .setText("Неправильная фамилия"));
+                next = BotState.LecturerEnterLogin;
+                next.responseNeeded = false;
             }
         }
 
@@ -395,8 +243,7 @@ public enum BotState {
         public void sendResponse(Message message) {
             execute(new SendMessage().
                     setChatId(message.getChatId()).
-                    setText("Введите пароль ↩")
-                    .setReplyMarkup(new InlineHolder().getLecturerPasswordInputInlineKeyboard()));
+                    setText("Введите Вашу Фамилию:"));
         }
 
         @Override
@@ -506,7 +353,7 @@ public enum BotState {
         @Override
         public void sendResponse(Message message) {
             execute(new SendMessage().
-                    setText("Вы препод. Вы можете делать это: ").
+                    setText("Вы вошли как преподователь.").
                     setChatId(message.getChatId()).
                     enableMarkdown(true).
                     setReplyMarkup(new ButtonsHolder().setLecturerKeyboard()));
@@ -549,8 +396,12 @@ public enum BotState {
                     getUserService().updateUser(member);
                     execute(new SendMessage().setChatId(update.getMessage().getChatId())
                             .setText("Отлично! Расаписание будет приходить в " + update.getMessage().getText()
-                                    + "(погрешность до 60 секунд)"));
-                    next = BotState.Student;
+                                    + " в течение минуты"));
+                    if (member instanceof Student) {
+                        next = BotState.Student;
+                    } else if (member instanceof Lecturer) {
+                        next = BotState.Lecturer;
+                    }
                 } else {
                     execute(new SendMessage().
                             setChatId(update.getMessage().getChatId()).

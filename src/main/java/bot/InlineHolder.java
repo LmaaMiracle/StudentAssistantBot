@@ -21,26 +21,7 @@ public class InlineHolder {
         inlineKeyboardMarkup.setKeyboard(rowsInline);
         return inlineKeyboardMarkup;
     }
-
-    public InlineKeyboardMarkup getLecturerLoginInlineKeyboard() {
-        rowsInline.add(rowInline);
-        rowsInline.add(new ArrayList<>());
-
-        rowInline.add(new InlineKeyboardButton("У меня нет логина").setCallbackData("login_info"));
-        rowsInline.get(1).add(new InlineKeyboardButton("Я забыл(-а) логин").setCallbackData("forgotten_login"));
-
-        inlineKeyboardMarkup.setKeyboard(rowsInline);
-        return inlineKeyboardMarkup;
-    }
-
-    public InlineKeyboardMarkup getLecturerPasswordInputInlineKeyboard() {
-        rowInline.add(new InlineKeyboardButton("Я забыл(-а) пароль").setCallbackData("forgotten_pass"));
-
-        rowsInline.add(rowInline);
-        inlineKeyboardMarkup.setKeyboard(rowsInline);
-        return inlineKeyboardMarkup;
-    }
-
+    
     public InlineKeyboardMarkup getStudentRegistrationInlineKeyboard() {
         rowsInline.add(rowInline);
         rowsInline.add(new ArrayList<>());
