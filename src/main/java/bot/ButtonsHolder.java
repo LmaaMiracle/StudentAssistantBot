@@ -8,17 +8,16 @@ import java.util.List;
 
 public class ButtonsHolder {
 
-    private ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
-    private final List<KeyboardRow> keyboard = new ArrayList<>();
-
-    private void setSettings(boolean oneTimeKeyboard) {
+    private void setSettings(ReplyKeyboardMarkup replyKeyboardMarkup) {
         replyKeyboardMarkup.setSelective(true);
         replyKeyboardMarkup.setResizeKeyboard(true);
-        replyKeyboardMarkup.setOneTimeKeyboard(oneTimeKeyboard);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
     }
 
     public ReplyKeyboardMarkup setMainMenuKeyboard() {
-        setSettings(false);
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        setSettings(replyKeyboardMarkup);
 
         keyboard.add(new KeyboardRow());
         keyboard.get(0).add(new KeyboardButton(Command.LECTURER));
@@ -30,7 +29,9 @@ public class ButtonsHolder {
     }
 
     public ReplyKeyboardMarkup setStudentKeyboard() {
-        setSettings(false);
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        setSettings(replyKeyboardMarkup);
 
         keyboard.add(new KeyboardRow());
         keyboard.get(0).add(new KeyboardButton(Command.GET_GROUP_SCHEDULE));
@@ -41,7 +42,7 @@ public class ButtonsHolder {
         keyboard.add(new KeyboardRow());
         keyboard.get(2).add(new KeyboardButton(Command.REGISTER_TIME));
         keyboard.add(new KeyboardRow());
-        keyboard.get(3  ).add(new KeyboardButton(Command.GET_HELP));
+        keyboard.get(3 ).add(new KeyboardButton(Command.GET_HELP));
 
 
         replyKeyboardMarkup.setKeyboard(keyboard);
@@ -50,7 +51,9 @@ public class ButtonsHolder {
     }
 
     public ReplyKeyboardMarkup setLecturerKeyboard() {
-        setSettings(false);
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        List<KeyboardRow> keyboard = new ArrayList<>();
+        setSettings(replyKeyboardMarkup);
 
         keyboard.add(new KeyboardRow());
         keyboard.get(0).add(new KeyboardButton(Command.GET_LECTURER_SCHEDULE));
