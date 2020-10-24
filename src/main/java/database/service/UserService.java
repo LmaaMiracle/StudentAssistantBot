@@ -100,15 +100,6 @@ public class UserService {
         return null;
     }
 
-    public LecturerData findLecturerDataBySecondName(String login) {
-        for (LecturerData lecturerData : usersDAO.findAllLecturerData()) {
-            if (login.equals(lecturerData.getSecondName())) {
-                return lecturerData;
-            }
-        }
-        return null;
-    }
-
     public List<LecturerData> findAllLecturerData() {
         return usersDAO.findAllLecturerData();
     }
