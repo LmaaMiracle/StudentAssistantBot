@@ -1,0 +1,20 @@
+@startuml
+|BotState|
+start;
+|GroupService|
+:Get Group By GroupName;
+|BotState|
+if (Group exists) then (yes)
+:Create new Student;
+:Set Attribures;
+|UserService|
+:Delete User;
+:Save User;
+|BotState|
+:NextBotState = Student;
+else (no)
+:Send Allert Message;
+:NextBotState = StudentRegistration;
+endif;
+end;
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+|Bot|
+start;
+:Get ChatID from Message;
+|UserServise|
+:Find User by Chat ID;
+|Bot|
+if (Input command == Start or Restart) then (yes)
+|UserServise|
+:Delete User from DB;
+|Bot|
+:Set BotState to Start;
+|BotState|
+:SendResponse;
+|Bot|
+:Create new User;
+|UserServise|
+:Save User;
+endif
+|Bot|
+:Get Botstate from User;
+|BotState|
+:HandleInput;
+:Next BotState;
+|UserServise|
+:Save or update User;
+|Bot|
+end;
+@enduml

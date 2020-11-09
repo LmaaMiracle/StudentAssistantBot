@@ -1,0 +1,5 @@
+@startuml
+start
+:DELETE * FROM user WHERE user_id = id;
+stop
+@enduml

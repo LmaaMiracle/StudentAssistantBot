@@ -1,0 +1,5 @@
+@startuml
+start
+:SELECT * FROM student;
+stop
+@enduml

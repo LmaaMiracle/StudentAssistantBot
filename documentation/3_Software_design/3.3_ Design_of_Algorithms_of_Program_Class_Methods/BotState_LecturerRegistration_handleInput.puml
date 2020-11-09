@@ -1,0 +1,20 @@
+@startuml
+|BotState|
+start;
+|UserService|
+:Get LecturerData By Surname;
+|BotState|
+if (LecturerData exists) then (yes)
+:Create new Lecturer;
+:Set Attribures;
+|UserService|
+:Delete User;
+:Save User;
+|BotState|
+:NextBotState = Lecturer;
+else (no)
+:Send Allert Message;
+:NextBotState = LecturerRegistration;
+endif;
+end;
+@enduml

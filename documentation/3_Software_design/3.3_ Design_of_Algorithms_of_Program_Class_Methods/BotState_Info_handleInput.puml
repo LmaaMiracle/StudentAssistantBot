@@ -1,0 +1,14 @@
+@startuml
+|BotState|
+start;
+if (Command == STUDENT) then (yes)
+:NextBotState = StudentRegistration;
+elseif (Command == Lecturer) then (yes)
+:NextBotState = LecturerRegistration;
+else (no)
+:Send Allert Message;
+:NextBotState = Info;
+endif;
+|BotState|
+end;
+@enduml

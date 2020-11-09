@@ -1,0 +1,8 @@
+@startuml
+start
+:findAllUsers;
+repeat
+:Select next user;
+repeat while (User.getChatId() != chatId)
+stop
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+|BotState|
+start;
+if (Command == GetSchedule) then (yes)
+|StudentAssistantBot|
+:SendSchedule;
+|BotState|
+elseif (Command == GetCallSchedule) then (yes)
+|StudentAssistantBot|
+:SendCallSchedule;
+|BotState|
+elseif (Command == GetLecturerList) then (yes)
+:get Lecturer List;
+|StudentAssistantBot|
+:SendLecturerList;
+|BotState|
+elseif (Command == RegisterTime) then (yes)
+:NextBotState = EnterTime;
+end;
+else
+:Send Allert Message;
+endif;
+:NextBotState = Student;
+end;
+@enduml

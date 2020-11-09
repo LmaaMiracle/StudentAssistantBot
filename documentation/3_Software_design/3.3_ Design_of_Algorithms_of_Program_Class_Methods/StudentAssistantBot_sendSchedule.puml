@@ -1,0 +1,11 @@
+@startuml
+start;
+if (User is) then (Student)
+:Get Schedule from Group;
+else (Lecturer)
+:Get Schedule from LecturerData;
+endif
+:Create object SendPhoto with UserChatID and Photo atribures;
+:Send Photo Actor;
+end;
+@enduml

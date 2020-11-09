@@ -1,0 +1,9 @@
+@startuml
+start
+if (findUserByChatId() != null) then (yes)
+:Update user;
+else (no)
+:Save user;
+endif
+stop
+@enduml

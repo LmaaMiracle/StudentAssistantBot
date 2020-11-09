@@ -1,0 +1,5 @@
+@startuml
+start
+:INSERT INTO user VALUES (...);
+stop
+@enduml

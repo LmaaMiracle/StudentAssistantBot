@@ -1,0 +1,8 @@
+@startuml
+start
+:findAllGroups();
+repeat
+:Select next group;
+repeat while (group.getName() != name)
+stop
+@enduml

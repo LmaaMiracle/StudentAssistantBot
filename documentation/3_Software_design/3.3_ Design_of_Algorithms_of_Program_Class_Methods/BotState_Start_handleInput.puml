@@ -1,0 +1,13 @@
+@startuml
+|BotState|
+start;
+if (Message has command INFO) then (yes)
+:NextBotState = Info;
+else (no)
+|StudentAssistantBot|
+:Send Allert Message;
+|BotState|
+:NextBotState = Start;
+endif;
+end;
+@enduml

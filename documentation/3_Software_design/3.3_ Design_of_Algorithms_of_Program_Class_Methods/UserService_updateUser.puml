@@ -1,0 +1,5 @@
+@startuml
+start
+:UPDATE user SET VALUES (...) WHERE user_id = id;
+stop
+@enduml

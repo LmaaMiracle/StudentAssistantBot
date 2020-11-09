@@ -1,0 +1,14 @@
+@startuml
+|ScheduleController|
+start;
+|UserService|
+:Find All Users;
+|ScheduleController|
+:Foreach user;
+if (User Schedule Time equals Local time) then (yes)
+|StudentAssistantBot|
+:SendSchedule;
+endif;
+|ScheduleController|
+end;
+@enduml

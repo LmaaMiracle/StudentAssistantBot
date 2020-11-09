@@ -1,0 +1,9 @@
+@startuml
+start
+repeat
+:Get user time input;
+repeat while (Input is not valid)
+:user.setScheduleTime(input);
+:saveOrUpdate(user);
+stop
+@enduml

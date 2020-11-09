@@ -1,0 +1,8 @@
+@startuml
+start
+:findAllLecturerData();
+repeat
+:Select next LecturerData instance;
+repeat while (lecturerData.getSurname() != surname)
+stop
+@enduml
